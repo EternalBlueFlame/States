@@ -3,7 +3,7 @@ package net.fexcraft.mod.states.cmds;
 import org.apache.commons.lang3.StringUtils;
 
 import net.fexcraft.lib.mc.api.registry.fCommand;
-import net.fexcraft.lib.mc.utils.Print;
+import net.fexcraft.mod.fsmm.util.Print;
 import net.fexcraft.mod.states.api.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.api.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.util.Config;

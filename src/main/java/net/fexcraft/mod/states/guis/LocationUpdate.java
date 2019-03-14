@@ -1,8 +1,9 @@
 package net.fexcraft.mod.states.guis;
 
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.fexcraft.lib.common.math.Time;
-import net.fexcraft.lib.mc.utils.Formatter;
 import net.fexcraft.lib.tmt.ModelBase;
+import net.fexcraft.mod.lib.fcl.Formatter;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
@@ -12,7 +13,6 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class LocationUpdate extends GuiScreen {
 	

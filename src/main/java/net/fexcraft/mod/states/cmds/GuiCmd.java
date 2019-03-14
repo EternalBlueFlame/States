@@ -1,7 +1,7 @@
 package net.fexcraft.mod.states.cmds;
 
 import net.fexcraft.lib.mc.api.registry.fCommand;
-import net.fexcraft.lib.mc.utils.Print;
+import net.fexcraft.mod.fsmm.util.Print;
 import net.fexcraft.mod.states.States;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;

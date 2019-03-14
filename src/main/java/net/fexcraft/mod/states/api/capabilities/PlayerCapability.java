@@ -89,12 +89,12 @@ public interface PlayerCapability extends ICommandSender, Taxable, AccountHolder
 
 	@Override
 	public default String getName(){
-		return this.getEntityPlayer().getName();
+		return this.getEntityPlayer().getDisplayName();
 	}
 
 	@Override
 	public default boolean canUseCommand(int permLevel, String commandName){
-		return this.getEntityPlayer().canUseCommand(permLevel, commandName);
+		return this.getEntityPlayer().canCommandSenderUseCommand(permLevel, commandName);
 	}
 
 	@Override
@@ -104,7 +104,7 @@ public interface PlayerCapability extends ICommandSender, Taxable, AccountHolder
 
 	@Override
 	public default MinecraftServer getServer(){
-		return this.getEntityPlayer().getServer();
+		return MinecraftServer.getServer();
 	}
 
 	public boolean isLoaded();

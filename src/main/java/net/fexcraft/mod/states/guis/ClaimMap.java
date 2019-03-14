@@ -7,7 +7,7 @@ import net.fexcraft.lib.common.math.RGB;
 import net.fexcraft.lib.mc.network.PacketHandler;
 import net.fexcraft.lib.mc.network.packet.PacketNBTTagCompound;
 import net.fexcraft.lib.mc.utils.Formatter;
-import net.fexcraft.lib.mc.utils.Print;
+import net.fexcraft.mod.fsmm.util.Print;
 import net.fexcraft.mod.fsmm.util.Config;
 import net.fexcraft.mod.states.util.ImageUtil;
 import net.minecraft.block.material.MapColor;

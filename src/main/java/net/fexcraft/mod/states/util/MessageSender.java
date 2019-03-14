@@ -13,17 +13,17 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.stream.JsonWriter;
 
-import net.fexcraft.lib.common.json.JsonUtil;
-import net.fexcraft.lib.mc.utils.Formatter;
-import net.fexcraft.lib.mc.utils.Print;
+import net.fexcraft.mod.fsmm.util.Print;
 import net.fexcraft.lib.mc.utils.Static;
+import net.fexcraft.mod.lib.fcl.Formatter;
+import net.fexcraft.mod.lib.fcl.JsonUtil;
 import net.fexcraft.mod.states.api.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.api.capabilities.StatesCapabilities;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.event.ClickEvent;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.event.ClickEvent;
 
 public class MessageSender {
     

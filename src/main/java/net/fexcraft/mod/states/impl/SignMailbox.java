@@ -4,9 +4,9 @@ import java.util.UUID;
 
 import net.fexcraft.lib.common.math.Time;
 import net.fexcraft.lib.mc.capabilities.sign.SignCapability;
-import net.fexcraft.lib.mc.utils.Formatter;
-import net.fexcraft.lib.mc.utils.Print;
+import net.fexcraft.mod.fsmm.util.Print;
 import net.fexcraft.lib.mc.utils.Static;
+import net.fexcraft.mod.lib.fcl.Formatter;
 import net.fexcraft.mod.states.api.Chunk;
 import net.fexcraft.mod.states.api.Mailbox.MailType;
 import net.fexcraft.mod.states.api.Mailbox.RecipientType;

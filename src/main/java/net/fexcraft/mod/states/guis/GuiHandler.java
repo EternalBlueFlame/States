@@ -1,10 +1,10 @@
 package net.fexcraft.mod.states.guis;
 
+import cpw.mods.fml.common.network.IGuiHandler;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.network.IGuiHandler;
 
-public class GuiHandler implements IGuiHandler{
+public class GuiHandler implements IGuiHandler {
 	
 	/**
 	 * 0 Welcome Screen

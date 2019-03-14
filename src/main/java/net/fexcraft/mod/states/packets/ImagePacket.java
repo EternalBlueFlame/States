@@ -3,10 +3,10 @@ package net.fexcraft.mod.states.packets;
 import java.awt.image.BufferedImage;
 import java.nio.charset.StandardCharsets;
 
+import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import io.netty.buffer.ByteBuf;
 import net.fexcraft.lib.mc.api.packet.IPacket;
 import net.fexcraft.mod.states.util.ImageCache;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 
 public class ImagePacket implements IPacket, IMessage {
 	

@@ -1,5 +1,7 @@
 package net.fexcraft.mod.states.events;
 
+import cpw.mods.fml.common.Mod;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.fexcraft.mod.states.impl.capabilities.ChunkCapabilityUtil;
 import net.fexcraft.mod.states.impl.capabilities.PlayerCapabilityUtil;
 import net.fexcraft.mod.states.impl.capabilities.SignTileEntityCapabilityUtil;
@@ -14,8 +16,8 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.world.ExplosionEvent;
 import net.minecraftforge.event.world.WorldEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+
+
 
 @Mod.EventBusSubscriber
 public class WorldEvents {
@@ -24,7 +26,7 @@ public class WorldEvents {
 	
 	@SubscribeEvent
 	public static void onWorldLoad(WorldEvent.Load event){
-		if(event != null && (event.getWorld().provider.getDimension() != 0 || event.getWorld().isRemote)) return;
+		if(event != null && (event.world.provider.dimensionId != 0 || event.world.isRemote)) return;
 		ImageCache.loadQueue();
 		ForcedChunksManager.load();
 		//event.getWorld().addEventListener(new TestListener());
@@ -32,7 +34,7 @@ public class WorldEvents {
 	
 	@SubscribeEvent
 	public static void onWorldUnload(WorldEvent.Unload event){
-		if(event.getWorld().provider.getDimension() != 0 || event.getWorld().isRemote) return;
+		if(event.world.provider.dimensionId != 0 || event.world.isRemote) return;
 		StateUtil.unloadAll(); StateUtil.clearAll(); ChunkEvents.LOADED = false;
 		ImageCache.saveQueue();
 		StateLogger.log("all", "Unloading World...");
@@ -42,7 +44,7 @@ public class WorldEvents {
 	@SubscribeEvent
 	public static void onExplosion(ExplosionEvent event){
 		try{
-			event.getExplosion().getAffectedBlockPositions().clear();
+			event.explosion.affectedBlockPositions.clear();
 			//TODO add config for no-wilderness/all/specific protection
 		}
 		catch(Exception e){

@@ -1,14 +1,15 @@
 package net.fexcraft.mod.states.util;
 
-import java.util.List;
-import java.util.Set;
 
+import cpw.mods.fml.client.IModGuiFactory;
+import cpw.mods.fml.client.config.GuiConfig;
+import cpw.mods.fml.client.config.IConfigElement;
 import net.fexcraft.mod.states.States;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraftforge.fml.client.IModGuiFactory;
-import net.minecraftforge.fml.client.config.GuiConfig;
-import net.minecraftforge.fml.client.config.IConfigElement;
+
+import java.util.List;
+import java.util.Set;
 
 public class GuiFactory implements IModGuiFactory {
 

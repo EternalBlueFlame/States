@@ -1,8 +1,8 @@
 package net.fexcraft.mod.states.guis;
 
-import net.fexcraft.lib.mc.network.PacketHandler;
 import net.fexcraft.lib.mc.network.packet.PacketNBTTagCompound;
-import net.fexcraft.lib.mc.utils.Print;
+import net.fexcraft.mod.fsmm.util.Print;
+import net.fexcraft.mod.lib.fcl.PacketHandler;
 import net.fexcraft.mod.states.util.ImageUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
