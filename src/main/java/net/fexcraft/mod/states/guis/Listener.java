@@ -42,7 +42,7 @@ public class Listener implements IPacketListener<PacketNBTTagCompound> {
 	public void process(PacketNBTTagCompound packet, Object[] objs){
 		Print.debug(packet.nbt.toString(), objs);
 		EntityPlayerMP player = (EntityPlayerMP)objs[0];
-		World world = player.world;
+		World world = player.worldObj;
 		BlockPos pos = player.getPosition();
 		switch(packet.nbt.getInteger("from")){
 			case 0:{

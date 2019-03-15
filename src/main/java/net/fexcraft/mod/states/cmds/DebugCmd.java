@@ -75,8 +75,8 @@ public class DebugCmd extends CommandBase {
         Chunk chunk = StateUtil.getChunk((EntityPlayer)sender);
         switch(args[0]){
             case "chunks":{
-                if(Static.dev()){
-                    Static.getServer().worlds[0].getChunkProvider().getLoadedChunks().forEach(ck -> {
+                if(Print.dev()){
+                    MinecraftServer.getServer().worlds[0].getChunkProvider().getLoadedChunks().forEach(ck -> {
                         Chunk chk = ck.getCapability(StatesCapabilities.CHUNK, null).getStatesChunk(true);
                         if(chk != null){
                             Print.log(chk.toJsonObject().toString());
@@ -84,7 +84,7 @@ public class DebugCmd extends CommandBase {
                     });
                     Print.chat(sender, "Chunk JSON's printed into console.");
                 }
-                Print.chat(sender, "&7Chunks (World0) loaded: &a" + Static.getServer().worlds[0].getChunkProvider().getLoadedChunkCount());
+                Print.chat(sender, "&7Chunks (World0) loaded: &a" + MinecraftServer.getServer().worlds[0].getChunkProvider().getLoadedChunkCount());
                 Print.chat(sender, "&7Chunks (States) loaded: &a" + States.CHUNKS.size());
                 return;
             }
@@ -97,7 +97,7 @@ public class DebugCmd extends CommandBase {
                 return;
             }
             case "districts":{
-                if(Static.dev()){
+                if(Print.dev()){
                     States.DISTRICTS.values().forEach((elm) -> {
                         Print.log(JsonUtil.setPrettyPrinting(elm.toJsonObject()));
                     });
@@ -112,7 +112,7 @@ public class DebugCmd extends CommandBase {
                 return;
             }
             case "municipalities":{
-                if(Static.dev()){
+                if(Print.dev()){
                     States.MUNICIPALITIES.values().forEach((elm) -> {
                         Print.log(JsonUtil.setPrettyPrinting(elm.toJsonObject()));
                     });
@@ -128,7 +128,7 @@ public class DebugCmd extends CommandBase {
                 return;
             }
             case "states":{
-                if(Static.dev()){
+                if(Print.dev()){
                     States.STATES.values().forEach((elm) -> {
                         Print.log(JsonUtil.setPrettyPrinting(elm.toJsonObject()));
                     });
@@ -178,7 +178,7 @@ public class DebugCmd extends CommandBase {
                 Print.chat(sender, "&9States: &7" + States.STATES.size() + "&8/&3" + chunk.getState().getStateFile().getParentFile().listFiles().length);
                 Print.chat(sender, "&9Municipalities: &7" + States.MUNICIPALITIES.size() + "&8/&3" + chunk.getMunicipality().getMunicipalityFile().getParentFile().listFiles().length);
                 Print.chat(sender, "&9Districts: &7" + States.DISTRICTS.size() + "&8/&3" + chunk.getDistrict().getDistrictFile().getParentFile().listFiles().length);
-                Print.chat(sender, "&7Chunks: &a" + Static.getServer().worlds[0].getChunkProvider().getLoadedChunkCount() + "&8/&3" + States.CHUNKS.size());
+                Print.chat(sender, "&7Chunks: &a" + MinecraftServer.getServer().worldServers[0].getChunkProvider().getLoadedChunkCount() + "&8/&3" + States.CHUNKS.size());
                 Print.chat(sender, "&6RAM: &5" + MB(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory())+ "&8/&7" + MB(Runtime.getRuntime().totalMemory()));
                 return;
             }

@@ -48,7 +48,7 @@ public class SignTileEntityCapabilityUtil implements ICapabilitySerializable<NBT
 
 	public static void processChunkChange(net.minecraft.world.chunk.Chunk chunk, String string){
             if(chunk == null){ return; }
-		chunk.getTileEntityMap().values().forEach(te -> {
+		chunk.chunkTileEntityMap.entrySet().forEach(te -> {
 			if(te instanceof TileEntitySign){
 				SignTileEntityCapability cap = te.getCapability(StatesCapabilities.SIGN_TE, null);
 				cap.update(chunk.getCapability(StatesCapabilities.CHUNK, null).getStatesChunk(), string, true);

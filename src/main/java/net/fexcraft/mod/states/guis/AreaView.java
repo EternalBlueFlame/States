@@ -4,11 +4,12 @@ import java.awt.Color;
 import java.util.ArrayList;
 
 import net.fexcraft.lib.common.math.RGB;
-import net.fexcraft.lib.mc.network.PacketHandler;
 import net.fexcraft.lib.mc.network.packet.PacketNBTTagCompound;
-import net.fexcraft.lib.mc.utils.Formatter;
-import net.fexcraft.lib.mc.utils.Print;
 import net.fexcraft.mod.fsmm.util.Config;
+import net.fexcraft.mod.fsmm.util.Print;
+import net.fexcraft.mod.lib.fcl.Formatter;
+import net.fexcraft.mod.lib.fcl.PacketHandler;
+import net.fexcraft.mod.states.api.ChunkPos;
 import net.fexcraft.mod.states.util.ImageCache;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.client.Minecraft;
@@ -60,7 +61,7 @@ public class AreaView extends GuiContainer {
 
 	@Override
 	protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY){
-		try{ this.pos = mc.world.getChunkFromBlockCoords(mc.player.getPosition()).getPos(); } catch(Exception e){}
+		try{ this.pos = new ChunkPos(mc.theWorld.getChunkFromBlockCoords((int)mc.thePlayer.posX,(int)mc.thePlayer.posZ)); } catch(Exception e){}
 		//
 		this.mc.getTextureManager().bindTexture(texture);
 		this.drawTexturedModalRect(this.guiLeft, this.guiTop, 0, 0, xSize + 12, ySize);
@@ -77,11 +78,11 @@ public class AreaView extends GuiContainer {
         bufferbuilder.pos((double)(x +   0), (double)(y +   0), (double)this.zLevel).tex((double)((float)(0 +   0) * 0.00390625F), (double)((float)(0 +   0) * 0.00390625F)).endVertex();
         tessellator.draw();
         //
-		mc.fontRenderer.drawString("VM: " + Listener.MAP_VIEW_MODES[instance.mode], 7, 7, MapColor.SNOW.colorValue);
-		mc.fontRenderer.drawString("Terrain: " + (instance.terrain ? "shown" : "hidden"), 7, 16, MapColor.SNOW.colorValue);
-		mc.fontRenderer.drawString(instance.x + "x", 7, 25, MapColor.SNOW.colorValue);
-		mc.fontRenderer.drawString(instance.z + "z", 7, 34, MapColor.SNOW.colorValue);
-		mc.fontRenderer.drawString("SyncRQ: " + (instance.sent ? "true" : "false"), 7, 43, MapColor.SNOW.colorValue);
+		mc.fontRenderer.drawString("VM: " + Listener.MAP_VIEW_MODES[instance.mode], 7, 7, MapColor.snowColor.colorValue);
+		mc.fontRenderer.drawString("Terrain: " + (instance.terrain ? "shown" : "hidden"), 7, 16, MapColor.snowColor.colorValue);
+		mc.fontRenderer.drawString(instance.x + "x", 7, 25, MapColor.snowColor.colorValue);
+		mc.fontRenderer.drawString(instance.z + "z", 7, 34, MapColor.snowColor.colorValue);
+		mc.fontRenderer.drawString("SyncRQ: " + (instance.sent ? "true" : "false"), 7, 43, MapColor.snowColor.colorValue);
 	}
 	
 	@Override
@@ -167,7 +168,7 @@ public class AreaView extends GuiContainer {
 		compound.setInteger("z", z);
 		compound.setBoolean("terrain", terrain);
 		compound.setInteger("mode", mode);
-		Print.debug(compound);
+		Print.debug(compound.toString());
 		PacketHandler.getInstance().sendToServer(new PacketNBTTagCompound(compound));
 		sent = true;
 	}

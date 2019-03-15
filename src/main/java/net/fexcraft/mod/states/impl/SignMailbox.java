@@ -51,83 +51,83 @@ public class SignMailbox implements SignCapability.Listener {
 
 	@Override
 	public boolean onPlayerInteract(SignCapability cap, PlayerInteractEvent event, IBlockState state, TileEntitySign tileentity){
-		if(event.getWorld().isRemote){ return false; }
+		if(event.world.isRemote){ return false; }
 		if(!active){
-			if(tileentity.signText[0].getUnformattedText().toLowerCase().equals("[st-mailbox]")){
-				TileEntity te = event.getWorld().getTileEntity(getPosAtBack(state, tileentity));
-				if(te == null){ Print.chat(event.getEntityPlayer(), "Not a valid mailbox position."); return false; }
+			if(tileentity.signText[0].toLowerCase().equals("[st-mailbox]")){
+				TileEntity te = event.world.getTileEntity(getPosAtBack(state, tileentity));
+				if(te == null){ Print.chat(event.entityPlayer, "Not a valid mailbox position."); return false; }
 				EnumFacing facing = state.getBlock() instanceof BlockWallSign ? EnumFacing.getFront(tileentity.getBlockMetadata()) : null;
 				if(!te.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing)){
-					Print.chat(event.getEntityPlayer(), "Block/TileEntity cannot store items."); return false;
+					Print.chat(event.entityPlayer, "Block/TileEntity cannot store items."); return false;
 				}
-				if(!PlayerEvents.checkAccess(te.getWorld(), te.getPos(), te.getWorld().getBlockState(te.getPos()), event.getEntityPlayer())){
-					Print.chat(event.getEntityPlayer(), "Block/TileEntity cannot be accessed."); return false;
+				if(!PlayerEvents.checkAccess(te.getWorldObj(), te.xCoord, te.yCoord, te.zCoord, te.getWorldObj().getBlockState(te.getPos()), event.entityPlayer)){
+					Print.chat(event.entityPlayer, "Block/TileEntity cannot be accessed."); return false;
 				}
-				Chunk chunk = StateUtil.getChunk(tileentity.getPos());
-				String type = tileentity.signText[1].getUnformattedText().toLowerCase();
+				Chunk chunk = StateUtil.getChunk(tileentity);
+				String type = tileentity.signText[1].toLowerCase();
 				switch(type){
 					case "state":{
-						if(!StatesPermissions.hasPermission(event.getEntityPlayer(), "state.set.mailbox", chunk.getState())){
-							Print.chat(event.getEntityPlayer(), "No permission to set the State Mailbox."); return false;
+						if(!StatesPermissions.hasPermission(event.entityPlayer, "state.set.mailbox", chunk.getState())){
+							Print.chat(event.entityPlayer, "No permission to set the State Mailbox."); return false;
 						}
 					}
 					case "municipality":{
-						if(!StatesPermissions.hasPermission(event.getEntityPlayer(), "municipality.set.mailbox", chunk.getMunicipality())){
-							Print.chat(event.getEntityPlayer(), "No permission to set the Municipality Mailbox."); return false;
+						if(!StatesPermissions.hasPermission(event.entityPlayer, "municipality.set.mailbox", chunk.getMunicipality())){
+							Print.chat(event.entityPlayer, "No permission to set the Municipality Mailbox."); return false;
 						}
 					}
 					case "district":{
-						if(!StatesPermissions.hasPermission(event.getEntityPlayer(), "district.set.mailbox", chunk.getDistrict())){
-							Print.chat(event.getEntityPlayer(), "No permission to set the District Mailbox."); return false;
+						if(!StatesPermissions.hasPermission(event.entityPlayer, "district.set.mailbox", chunk.getDistrict())){
+							Print.chat(event.entityPlayer, "No permission to set the District Mailbox."); return false;
 						}
 					}
 					case "company": break;//TODO
 					case "player":{
-						String rec = tileentity.signText[2].getUnformattedText().toLowerCase();
+						String rec = tileentity.signText[2].toLowerCase();
 						com.mojang.authlib.GameProfile prof = Static.getServer().getPlayerProfileCache().getGameProfileForUsername(rec);
 						if(prof == null){
-							Print.chat(event.getEntityPlayer(), "Couldn't find player UUID in cache.");
+							Print.chat(event.entityPlayer, "Couldn't find player UUID in cache.");
 							return false;
 						}
-						if(prof.getId().equals(event.getEntityPlayer().getGameProfile().getId()) || StatesPermissions.hasPermission(event.getEntityPlayer(), "admin", null)){
+						if(prof.getId().equals(event.entityPlayer.getGameProfile().getId()) || StatesPermissions.hasPermission(event.entityPlayer, "admin", null)){
 							this.recipient = prof.getId();
 							tileentity.signText[1] = Formatter.newTextComponentString(prof.getName());
-							tileentity.signText[2] = Formatter.newTextComponentString("");
+							tileentity.signText[2] = "";
 						}//TODO municipality check
 						else{
-							Print.chat(event.getEntityPlayer(), "No permission to set mailbox of that player.");
+							Print.chat(event.entityPlayer, "No permission to set mailbox of that player.");
 						}
 						break;
 					}
 					case "center": case "central": case "fallback":{
-						if(!StatesPermissions.hasPermission(event.getEntityPlayer(), "admin", chunk)){
-							Print.chat(event.getEntityPlayer(), "No permission to set the Central/Fallback Mailbox."); return false;
+						if(!StatesPermissions.hasPermission(event.entityPlayer, "admin", chunk)){
+							Print.chat(event.entityPlayer, "No permission to set the Central/Fallback Mailbox."); return false;
 						}
 						break;
 					}
 					default:{
-						Print.chat(event.getEntityPlayer(), "Invalid mailbox type.");
+						Print.chat(event.entityPlayer, "Invalid mailbox type.");
 						return false;
 					}
 				}
 				tileentity.signText[0] = Formatter.newTextComponentString("&0[&3Mailbox&0]");
 				try{
 					switch(type){
-						case "state": chunk.getState().setMailbox(tileentity.getPos()); break;
-						case "municipality": chunk.getMunicipality().setMailbox(tileentity.getPos()); break;
-						case "district": chunk.getDistrict().setMailbox(tileentity.getPos()); break;
+						case "state": chunk.getState().setMailbox(tileentity); break;
+						case "municipality": chunk.getMunicipality().setMailbox(tileentity); break;
+						case "district": chunk.getDistrict().setMailbox(tileentity); break;
 						case "companry": break;//TODO
 						case "player":{
-							if(event.getEntityPlayer().getGameProfile().getId().equals(recipient)){
-								event.getEntityPlayer().getCapability(StatesCapabilities.PLAYER, null).setMailbox(tileentity.getPos());
+							if(event.entityPlayer.getGameProfile().getId().equals(recipient)){
+								event.entityPlayer.getCapability(StatesCapabilities.PLAYER, null).setMailbox(tileentity);
 							}
 							else{
-								StateUtil.getPlayer(recipient, true).setMailbox(tileentity.getPos());
+								StateUtil.getPlayer(recipient, true).setMailbox(tileentity);
 							}
 							break;
 						}
 						/*case "center":*/ case "central": case "fallback":{
-							StateUtil.getState(-1).setMailbox(tileentity.getPos());
+							StateUtil.getState(-1).setMailbox(tileentity);
 							break;
 						}
 					}
@@ -139,14 +139,14 @@ public class SignMailbox implements SignCapability.Listener {
 				}
 				catch(Exception e){
 					e.printStackTrace();
-					Print.chat(event.getEntityPlayer(), "Error occured, check log for info.");
+					Print.chat(event.entityPlayer, "Error occured, check log for info.");
 				}
 				return true;
 			}
 			else return false;
 		}
 		else{
-			Print.chat(event.getEntityPlayer(), "&k!000-000!000-000!");
+			Print.chat(event.entityPlayer, "&k!000-000!000-000!");
 		}
 		return false;
 	}

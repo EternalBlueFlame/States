@@ -2,6 +2,7 @@ package net.fexcraft.mod.states.objects;
 
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Items;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
 public class CreativeTab extends CreativeTabs {
@@ -11,8 +12,8 @@ public class CreativeTab extends CreativeTabs {
 	public CreativeTab(){ super("states"); }
 
 	@Override
-	public ItemStack getTabIconItem(){
-		return new ItemStack(Items.PAPER);
+	public Item getTabIconItem(){
+		return Items.paper;
 	}
 	
 }

@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import cpw.mods.fml.common.Mod;
+import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import net.fexcraft.lib.common.math.Time;
@@ -39,7 +40,6 @@ import net.minecraft.tileentity.TileEntitySign;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraftforge.event.ServerChatEvent;
@@ -98,13 +98,13 @@ public class PlayerEvents {
 	
 	@SubscribeEvent
 	public static void onRickClickBlock(PlayerInteractEvent.RightClickBlock event){
-		if(event.getWorld().isRemote || event.getEntityPlayer().dimension != 0 || event.getEntityPlayer().getActiveHand() == EnumHand.OFF_HAND){
+		if(event.world.isRemote || event.getEntityPlayer().dimension != 0 || event.getEntityPlayer().getActiveHand() == EnumHand.OFF_HAND){
 			return;
 		}
-		IBlockState state = event.getWorld().getBlockState(event.getPos());
+		IBlockState state = event.world.getBlockState(event.getPos());
 		if(state.getBlock() instanceof BlockSign){
-			//IBlockState state = event.getWorld().getBlockState(event.getPos());
-			TileEntitySign te_sign = (TileEntitySign)event.getWorld().getTileEntity(event.getPos());
+			//IBlockState state = event.world.getBlockState(event.getPos());
+			TileEntitySign te_sign = (TileEntitySign)event.world.getTileEntity(event.getPos());
 			if(te_sign == null || te_sign.signText == null || te_sign.signText[0] == null){
 				return;
 			}
@@ -123,7 +123,7 @@ public class PlayerEvents {
 				|| state.getBlock() instanceof BlockDropper || state.getBlock() instanceof BlockLever
 				|| state.getBlock() instanceof BlockButton || state.getBlock() instanceof BlockPressurePlate
 				|| state.getBlock() instanceof BlockRedstoneRepeater || state.getBlock() instanceof BlockRedstoneComparator){
-			if(!checkAccess(event.getWorld(), event.getPos(), state, event.getEntityPlayer())){
+			if(!checkAccess(event.world, event.getPos(), state, event.getEntityPlayer())){
 				Print.chat(event.getEntityPlayer(), "No permission to interact with these blocks here.");
 				event.setCanceled(true);
 				return;
@@ -134,9 +134,9 @@ public class PlayerEvents {
 	
 	@SubscribeEvent
 	public static void onBlockBreak(BlockEvent.BreakEvent event){
-		if(event.getPlayer().dimension != 0){ return; }
-		if(!checkAccess(event.getWorld(), event.getPos(), event.getState(), event.getPlayer())){
-			Print.bar(event.getPlayer(), "No permission to break blocks here.");
+		if(event.player.dimension != 0){ return; }
+		if(!checkAccess(event.world, event.getPos(), event.getState(), event.getPlayer())){
+			Print.bar(event.player, "No permission to break blocks here.");
 			event.setCanceled(true);
 		}
 		return;
@@ -144,9 +144,9 @@ public class PlayerEvents {
 
 	@SubscribeEvent
 	public static void onBlockPlace(BlockEvent.PlaceEvent event){
-		if(event.getPlayer().dimension != 0){ return; }
-		if(!checkAccess(event.getWorld(), event.getPos(), event.getState(), event.getPlayer())){
-			Print.bar(event.getPlayer(), "No permission to place blocks here.");
+		if(event.player.dimension != 0){ return; }
+		if(!checkAccess(event.world, event.getPos(), event.getState(), event.player)){
+			Print.bar(event.player, "No permission to place blocks here.");
 			event.setCanceled(true);
 		}
 		return;
@@ -226,12 +226,12 @@ public class PlayerEvents {
 	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public static void onMessage(ServerChatEvent event){
 		if(!Config.STATES_CHAT){
-			MessageSender.toWebhook(event.getPlayer().getCapability(StatesCapabilities.PLAYER, null), event.getMessage());
+			MessageSender.toWebhook(event.player.getCapability(StatesCapabilities.PLAYER, null), event.getMessage());
 			return;
 		}
-		//event.setCanceled(true); Static.getServer().addScheduledTask(() -> { Sender.sendAs(event.getPlayer(), event.getMessage()); });
-		PlayerCapability cap = event.getPlayer().getCapability(StatesCapabilities.PLAYER, null); TextComponentTranslation com = (TextComponentTranslation)event.getComponent();
-		com.getFormatArgs()[0] = new TextComponentString(Formatter.format("&" + (StateUtil.isAdmin(event.getPlayer()) ? "4" : "6") + "#&8] " + cap.getFormattedNickname() + "&0:"));
+		//event.setCanceled(true); Static.getServer().addScheduledTask(() -> { Sender.sendAs(event.player, event.getMessage()); });
+		PlayerCapability cap = event.player.getCapability(StatesCapabilities.PLAYER, null); TextComponentTranslation com = (TextComponentTranslation)event.getComponent();
+		com.getFormatArgs()[0] = new TextComponentString(Formatter.format("&" + (StateUtil.isAdmin(event.player) ? "4" : "6") + "#&8] " + cap.getFormattedNickname() + "&0:"));
 		com.getFormatArgs()[1] = new TextComponentString(Formatter.format("&7" + ((ITextComponent)com.getFormatArgs()[1]).getUnformattedText()));
 		event.setComponent(new TextComponentTranslation("states.chat.text", com.getFormatArgs()));
 		MessageSender.toWebhook(cap, event.getMessage());
@@ -239,7 +239,7 @@ public class PlayerEvents {
 	
 	@SubscribeEvent
 	public static void onTick(TickEvent.PlayerTickEvent event){
-		if(event.player.world.isRemote || event.player.dimension != 0){ return; }
+		if(event.player.worldObj.isRemote || event.player.dimension != 0){ return; }
 		PlayerCapability player = event.player.getCapability(StatesCapabilities.PLAYER, null);
 		if(player != null && Time.getDate() > player.getLastPositionUpdate()){
 			player.setPositionUpdate(Time.getDate());

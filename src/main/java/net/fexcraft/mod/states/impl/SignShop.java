@@ -23,7 +23,6 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntitySign;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -49,50 +48,50 @@ public class SignShop implements SignCapability.Listener {
 
 	@Override
 	public boolean onPlayerInteract(SignCapability cap, PlayerInteractEvent event, IBlockState state,TileEntitySign tileentity){
-		if(event.getWorld().isRemote){ return false; }
+		if(event.world.isRemote){ return false; }
 		if(!active){
-			if(tileentity.signText[0].getUnformattedText().toLowerCase().equals("[st-shop]")){
-				if(!(tileentity.signText[3].getUnformattedText().toLowerCase().equals("buy") || tileentity.signText[3].getUnformattedText().toLowerCase().equals("sell"))){
-					Print.chat(event.getEntityPlayer(), "Invalid type on line 4.");
+			if(tileentity.signText[0].toLowerCase().equals("[st-shop]")){
+				if(!(tileentity.signText[3].toLowerCase().equals("buy") || tileentity.signText[3].toLowerCase().equals("sell"))){
+					Print.chat(event.entityPlayer, "Invalid type on line 4.");
 					return false;
 				}
 				tileentity.signText[0] = Formatter.newTextComponentString("&0[&3St&8-&3Shop&0]");
-				TileEntity te = event.getWorld().getTileEntity(getPosAtBack(state, tileentity));
+				TileEntity te = event.world.getTileEntity(getPosAtBack(state, tileentity));
 				EnumFacing facing = state.getBlock() instanceof BlockWallSign ? EnumFacing.getFront(tileentity.getBlockMetadata()) : null;
-				if(te != null && te.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing) && PlayerEvents.checkAccess(te.getWorld(), te.getPos(), te.getWorld().getBlockState(te.getPos()), event.getEntityPlayer())){
+				if(te != null && te.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing) && PlayerEvents.checkAccess(te.getWorld(), te.getPos(), te.getWorld().getBlockState(te.getPos()), event.entityPlayer)){
 					itemtype = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing).getStackInSlot(0).copy();
-					if(!tileentity.signText[1].getUnformattedText().equals("")){
+					if(!tileentity.signText[1].equals("")){
 						Chunk chunk = StateUtil.getChunk(te.getPos());
-						switch(tileentity.signText[1].getUnformattedText().toLowerCase()){
+						switch(tileentity.signText[1].toLowerCase()){
 							case "district":
 							case "municipality":{
-								if(StatesPermissions.hasPermission(event.getEntityPlayer(), "shop.create.municipality", chunk)){
+								if(StatesPermissions.hasPermission(event.entityPlayer, "shop.create.municipality", chunk)){
 									account = new ResourceLocation("municipality:" + chunk.getMunicipality().getId());
 								}
 								else{
-									Print.chat(event.getEntityPlayer(), "&9No permission to Create Municipality Shops.");
+									Print.chat(event.entityPlayer, "&9No permission to Create Municipality Shops.");
 									return true;
 								}
 								break;
 							}
 							case "state":{
-								if(StatesPermissions.hasPermission(event.getEntityPlayer(), "shop.create.state", chunk)){
+								if(StatesPermissions.hasPermission(event.entityPlayer, "shop.create.state", chunk)){
 									account = new ResourceLocation("state:" + chunk.getMunicipality().getId());
 								}
 								else{
-									Print.chat(event.getEntityPlayer(), "&9No permission to Create State Shops.");
+									Print.chat(event.entityPlayer, "&9No permission to Create State Shops.");
 									return true;
 								}
 								break;
 							}
 							case "admin":
 							case "server":{
-								if(StatesPermissions.hasPermission(event.getEntityPlayer(), "shop.create.server", chunk)){
+								if(StatesPermissions.hasPermission(event.entityPlayer, "shop.create.server", chunk)){
 									account = States.SERVERACCOUNT.getAsResourceLocation();
 									server = true;
 								}
 								else{
-									Print.chat(event.getEntityPlayer(), "&9No permission to Create Server Shops.");
+									Print.chat(event.entityPlayer, "&9No permission to Create Server Shops.");
 									return true;
 								}
 								break;
@@ -104,17 +103,17 @@ public class SignShop implements SignCapability.Listener {
 						}
 					}
 					if(account == null){
-						account = event.getEntityPlayer().getCapability(StatesCapabilities.PLAYER, null).getAccount().getAsResourceLocation();
+						account = event.entityPlayer.getCapability(StatesCapabilities.PLAYER, null).getAccount().getAsResourceLocation();
 					}
 					tileentity.signText[1] = new TextComponentString(itemtype.getDisplayName());
 					try{
-						long leng = Long.parseLong(tileentity.signText[2].getUnformattedText());
+						long leng = Long.parseLong(tileentity.signText[2]);
 						tileentity.signText[2] = Formatter.newTextComponentString(Config.getWorthAsString(leng, true, leng < 10));
 						price = leng;
 					}
 					catch(Exception e){
 						e.printStackTrace();
-						Print.chat(event.getEntityPlayer(), "Invalid Price. (1000 == 1" + Config.CURRENCY_SIGN + "!)");
+						Print.chat(event.entityPlayer, "Invalid Price. (1000 == 1" + Config.CURRENCY_SIGN + "!)");
 						return false;
 					}
 					cap.setActive();
@@ -123,60 +122,60 @@ public class SignShop implements SignCapability.Listener {
 					return true;
 				}
 				else{
-					Print.bar(event.getEntityPlayer(), "No ItemStack Container found.");
+					Print.bar(event.entityPlayer, "No ItemStack Container found.");
 				}
 			}
 		}
 		else{
-			TileEntity te = event.getWorld().getTileEntity(getPosAtBack(state, tileentity));
+			TileEntity te = event.world.getTileEntity(getPosAtBack(state, tileentity));
 			EnumFacing facing = state.getBlock() instanceof BlockWallSign ? EnumFacing.getFront(tileentity.getBlockMetadata()) : null;
 			if(te != null && te.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing)){
-				if(event.getEntityPlayer().getHeldItemMainhand().isEmpty()){
+				if(event.entityPlayer.getHeldItemMainhand().isEmpty()){
 					Account shop = DataManager.getAccount(account.toString(), true, false);
 					if(shop == null){
-						Print.chat(event.getEntityPlayer(), "Shop Account couldn't be loaded.");
+						Print.chat(event.entityPlayer, "Shop Account couldn't be loaded.");
 						return true;
 					}
-					Account playeracc = event.getEntityPlayer().getCapability(StatesCapabilities.PLAYER, null).getAccount();
-					Bank playerbank = event.getEntityPlayer().getCapability(StatesCapabilities.PLAYER, null).getBank();
+					Account playeracc = event.entityPlayer.getCapability(StatesCapabilities.PLAYER, null).getAccount();
+					Bank playerbank = event.entityPlayer.getCapability(StatesCapabilities.PLAYER, null).getBank();
 					IItemHandler te_handler = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing);
-					IItemHandler pl_handler = event.getEntityPlayer().getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
-					if(tileentity.signText[3].getUnformattedText().toLowerCase().startsWith("buy")){
-						if(hasStack(event.getEntityPlayer(), te_handler, false)){
-							if(playerbank.processAction(Bank.Action.TRANSFER, event.getEntityPlayer(), playeracc, price, shop)){
-								event.getEntityPlayer().addItemStackToInventory(getStackIfPossible(te_handler, false));
-								Print.bar(event.getEntityPlayer(), "Items bought.");
+					IItemHandler pl_handler = event.entityPlayer.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
+					if(tileentity.signText[3].toLowerCase().startsWith("buy")){
+						if(hasStack(event.entityPlayer, te_handler, false)){
+							if(playerbank.processAction(Bank.Action.TRANSFER, event.entityPlayer, playeracc, price, shop)){
+								event.entityPlayer.addItemStackToInventory(getStackIfPossible(te_handler, false));
+								Print.bar(event.entityPlayer, "Items bought.");
 							}
 						}
 					}
-					else if(tileentity.signText[3].getUnformattedText().toLowerCase().startsWith("sell")){
-						if(hasStack(event.getEntityPlayer(), pl_handler, true) && hasSpace(event.getEntityPlayer(), te_handler)){
-							if(DataManager.getBank(shop.getBankId(), true, false).processAction(Bank.Action.TRANSFER, event.getEntityPlayer(), shop, price, playeracc)){
+					else if(tileentity.signText[3].toLowerCase().startsWith("sell")){
+						if(hasStack(event.entityPlayer, pl_handler, true) && hasSpace(event.entityPlayer, te_handler)){
+							if(DataManager.getBank(shop.getBankId(), true, false).processAction(Bank.Action.TRANSFER, event.entityPlayer, shop, price, playeracc)){
 								addStack(te_handler, getStackIfPossible(pl_handler, true));
-								Print.bar(event.getEntityPlayer(), "Items sold.");
+								Print.bar(event.entityPlayer, "Items sold.");
 							}
 						}
 					}
 					else{
-						Print.chat(event.getEntityPlayer(), "Invalid Mode at line 4.");
+						Print.chat(event.entityPlayer, "Invalid Mode at line 4.");
 					}
 				}
 				else{
-					Print.chat(event.getEntityPlayer(), "&9Shop Owner: &7" + account.toString());
-					Print.chat(event.getEntityPlayer(), "&9Item: &7" + itemtype.getDisplayName());
-					Print.chat(event.getEntityPlayer(), "&9Reg: &7" + itemtype.getItem().getRegistryName().toString());
-					if(itemtype.getMetadata() > 0){
-						Print.chat(event.getEntityPlayer(), "&9Meta: &8" + itemtype.getMetadata());
+					Print.chat(event.entityPlayer, "&9Shop Owner: &7" + account.toString());
+					Print.chat(event.entityPlayer, "&9Item: &7" + itemtype.getDisplayName());
+					Print.chat(event.entityPlayer, "&9Reg: &7" + itemtype.getItem().delegate.name());
+					if(itemtype.getItemDamage() > 0){
+						Print.chat(event.entityPlayer, "&9Meta: &8" + itemtype.getItemDamage());
 					}
-					Print.chat(event.getEntityPlayer(), "&9Amount: &6" + itemtype.getCount());
+					Print.chat(event.entityPlayer, "&9Amount: &6" + itemtype.stackSize);
 					if(itemtype.hasTagCompound()){
-						Print.chat(event.getEntityPlayer(), "&9NBT: &8" + itemtype.getTagCompound().toString());
+						Print.chat(event.entityPlayer, "&9NBT: &8" + itemtype.getTagCompound().toString());
 					}
 				}
 				return true;
 			}
 			else{
-				Print.bar(event.getEntityPlayer(), "No ItemStack Container linked.");
+				Print.bar(event.entityPlayer, "No ItemStack Container linked.");
 			}
 		}
 		return false;

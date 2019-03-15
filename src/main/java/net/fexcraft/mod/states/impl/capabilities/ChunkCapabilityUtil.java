@@ -88,7 +88,7 @@ public class ChunkCapabilityUtil implements ICapabilitySerializable<NBTBase>{
         public net.fexcraft.mod.states.api.Chunk getStatesChunk(boolean allownull){
             if(allownull){ return statechunk; }
             if(statechunk == null){
-                statechunk = StateUtil.getChunk(chunk.x, chunk.z);
+                statechunk = StateUtil.getChunk(chunk.xPosition, chunk.zPosition);
             }
             return statechunk;
         }

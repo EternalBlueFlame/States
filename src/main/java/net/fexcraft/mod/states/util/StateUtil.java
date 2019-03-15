@@ -39,9 +39,10 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.server.permission.PermissionAPI;
 
 public class StateUtil extends TimerTask {
@@ -55,8 +56,12 @@ public class StateUtil extends TimerTask {
     }
     
     public static @Nullable Chunk getChunk(BlockPos pos){
-        return getChunk(pos.getX() >> 4, pos.getZ() >> 4);
+        return getChunk(pos.x() >> 4, pos.getZ() >> 4);
     }
+
+	public static @Nullable Chunk getChunk(TileEntity pos){
+		return getChunk(pos.xCoord >> 4, pos.zCoord >> 4);
+	}
     
     public static @Nullable Chunk getChunk(ChunkPos pos){
         return States.CHUNKS.get(pos);
@@ -161,7 +166,7 @@ public class StateUtil extends TimerTask {
 			return getPlayer(uuid, loadtemp);
 		}
 		catch(Exception e){
-			GameProfile gp = Static.getServer().getPlayerProfileCache().getGameProfileForUsername(receiver);
+			GameProfile gp = MinecraftServer.getServer().getPlayerProfileCache().getGameProfileForUsername(receiver);
 			return gp == null ? null : getPlayer(gp.getId(), loadtemp);
 		}
 	}
@@ -176,10 +181,10 @@ public class StateUtil extends TimerTask {
 	}
 
 	public static void announce(MinecraftServer server, AnnounceLevel level, String string, int range, ICommandSender sender){
-		server = server == null ? Static.getServer() : server;
+		server = server == null ? MinecraftServer.getServer() : server;
 		switch(level){
 			case ALL:
-				server.getPlayerList().sendMessage(new TextComponentString(Formatter.format(string)), true);
+				server.getPlayerList().sendMessage(new ChatComponentText(Formatter.format(string)));
 				MessageSender.toWebhook(null, string);
 				break;
 			case UNION:
@@ -249,7 +254,7 @@ public class StateUtil extends TimerTask {
 	}
 
     public static @Nullable net.minecraft.world.chunk.Chunk getChunk(Chunk chunk){
-        return Static.getServer().worlds[0].getChunkProvider().getLoadedChunk(chunk.xCoord(), chunk.zCoord());
+        return MinecraftServer.getServer().worldServers[0].getChunkProvider().loadChunk(chunk.xCoord(), chunk.zCoord());
     }
 
 	public static boolean isAdmin(EntityPlayer sender){

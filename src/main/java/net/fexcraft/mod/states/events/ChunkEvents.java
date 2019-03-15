@@ -31,7 +31,7 @@ public class ChunkEvents {
     @SubscribeEvent
     public static void onLoad(ChunkEvent.Load event){
 		if(!LOADED){
-			States.updateSaveDirectory(event.getWorld());
+			States.updateSaveDirectory(event.world);
 			StateLogger.log("all", "Loading World...");
 			for(int i : def_st){
 				if(!States.STATES.containsKey(i)){
@@ -52,21 +52,21 @@ public class ChunkEvents {
 				}
 			} LOADED = true;
 		}
-        if(event.getWorld().provider.getDimension() != 0) return;
-        if(event.getWorld().isRemote){
+        if(event.world.provider.dimensionId != 0) return;
+        if(event.world.isRemote){
     		//net.fexcraft.mod.states.guis.Minimap.loadChunk(event.getChunk());
     		return;
         } /*if(!WorldEvents.LOADED){ WorldEvents.onWorldLoad(null); WorldEvents.LOADED = true; }*/
-        ChunkPos pos = new ChunkPos(event.getChunk().x, event.getChunk().z);
+        ChunkPos pos = new ChunkPos(event.getChunk().xPosition,0, event.getChunk().zPosition);
         if(!States.CHUNKS.containsKey(pos)){
-            States.CHUNKS.put(pos, new GenericChunk(event.getWorld(), pos));
+            States.CHUNKS.put(pos, new GenericChunk(event.world, pos));
         }
     }
     
     @SubscribeEvent
     public static void onUnload(ChunkEvent.Unload event){
-        if(event.getWorld().provider.getDimension() != 0) return;
-    	if(event.getWorld().isRemote){
+        if(event.world.provider.dimensionId != 0) return;
+    	if(event.world.isRemote){
     		//net.fexcraft.mod.states.guis.Minimap.unloadChunk(event.getChunk());
     		return;
     	}
@@ -80,10 +80,10 @@ public class ChunkEvents {
             boolean matches = file.exists() && JsonUtil.get(file).get("changed").getAsLong() == chunk.getChanged();
             chunk.save();
             if(!matches || chunk.getEdited() > chunk.getChanged()){
-            	ImageCache.update(event.getWorld(), event.getChunk());
+            	ImageCache.update(event.world, event.getChunk());
             }
         }
-        event.getChunk().getTileEntityMap().keySet().forEach(key -> {
+        event.getChunk().chunkTileEntityMap.keySet().forEach(key -> {
             SignTileEntityCapabilityUtil.TILEENTITIES.remove(key);
         });
     }

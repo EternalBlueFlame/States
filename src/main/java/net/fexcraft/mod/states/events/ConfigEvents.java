@@ -11,7 +11,7 @@ public class ConfigEvents {
 	
 	@SubscribeEvent
 	public static void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event){
-		if(event.getModID().equals(States.MODID)){
+		if(event.modID.equals(States.MODID)){
 			Config.refresh();
 			if(Config.getConfig().hasChanged()){
 				Config.getConfig().save();

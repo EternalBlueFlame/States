@@ -4,11 +4,11 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import net.fexcraft.mod.lib.fcl.Formatter;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import net.fexcraft.lib.common.math.Time;
 import net.fexcraft.lib.mc.api.registry.fItem;
-import net.fexcraft.lib.mc.utils.Formatter;
 import net.fexcraft.lib.mc.utils.Static;
 import net.fexcraft.mod.states.States;
 import net.minecraft.client.util.ITooltipFlag;
@@ -40,10 +40,10 @@ public class MailItem extends Item {
     @SideOnly(Side.CLIENT)
     public void addInformation(ItemStack stack, @Nullable World world, List<String> tooltip, ITooltipFlag flag){
     	//if(stack.getTagCompound() == null && this.getDamage(stack) > 1){this.setDamage(stack, 1); return; }
-    	if(stack.getMetadata() == 0){
+    	if(stack.getItemDamage() == 0){
         	tooltip.add(Formatter.format("&7Empty Mail."));
     	}
-    	else if(stack.getMetadata() == 1){
+    	else if(stack.getItemDamage() == 1){
         	tooltip.add(Formatter.format("&cExpired mail."));
     	}
     	else{
@@ -71,7 +71,7 @@ public class MailItem extends Item {
     public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ){
     	if(world.isRemote) return EnumActionResult.PASS;
     	ItemStack stack = player.getHeldItem(hand);
-    	if(stack.getMetadata() > 1){ Static.getServer().commandManager.executeCommand(player, "/mail read"); }
+    	if(stack.getItemDamage() > 1){ Static.getServer().commandManager.executeCommand(player, "/mail read"); }
         return EnumActionResult.PASS;
     }
     
@@ -86,8 +86,8 @@ public class MailItem extends Item {
     @Override
     public String getUnlocalizedName(ItemStack stack){
     	int var = this.getClass().getAnnotation(fItem.class).variants();
-    	if(stack.getMetadata() < var && stack.getMetadata() >= 0){
-    		return this.getUnlocalizedName() + "_" + this.getClass().getAnnotation(fItem.class).custom_variants()[stack.getMetadata()];
+    	if(stack.getItemDamage() < var && stack.getItemDamage() >= 0){
+    		return this.getUnlocalizedName() + "_" + this.getClass().getAnnotation(fItem.class).custom_variants()[stack.getItemDamage()];
     	} else return this.getUnlocalizedName();
     }
 	

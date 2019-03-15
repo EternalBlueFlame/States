@@ -96,11 +96,11 @@ public class ChunkCmd extends CommandBase {
 					Print.chat(sender, "&7Please enter the numerical district ID as second argument!");
 					return;
 				}
-				player.openGui(States.INSTANCE, 10, player.world, Integer.parseInt(args[1]), args[0].equals("claim") ? 0 : 1, 0);
+				player.openGui(States.INSTANCE, 10, player.worldObj, Integer.parseInt(args[1]), args[0].equals("claim") ? 0 : 1, 0);
 				return;
 			}
 			case "tempclaim":{
-				player.openGui(States.INSTANCE, 10, player.world, -2, 0, 0);
+				player.openGui(States.INSTANCE, 10, player.worldObj, -2, 0, 0);
 				return;
 			}
 			case "map":{
@@ -151,7 +151,7 @@ public class ChunkCmd extends CommandBase {
 						Print.chat(sender, "&c-> &9" + chunk.getLinkedChunks().get(i));
 					}
 				}
-				Print.chat(sender, "&9Linked: &7" + (chunk.getLink() == null ? "false" : chunk.getLink().x + "x, " + chunk.getLink().z + "z"));
+				Print.chat(sender, "&9Linked: &7" + (chunk.getLink() == null ? "false" : chunk.getLink().posX + "x, " + chunk.getLink().posZ + "z"));
 				Print.chat(sender, "&2Claimed by &7" + Static.getPlayerNameByUUID(chunk.getClaimer()) + "&2 at &8" + Time.getAsString(chunk.getCreated()));
 				if(chunk.getDistrict().getId() == -2){
 					Print.chat(sender, "&9Transit Zone till: &7" + Time.getAsString(chunk.getChanged() + Time.DAY_MS));
@@ -165,7 +165,7 @@ public class ChunkCmd extends CommandBase {
 				if(hasPerm("chunk.update", player, chunk)){
 					int range = args.length > 1 ? Integer.parseInt(args[1]) : 0;
 					if(range <= 0){
-						ImageCache.update(player.world, player.world.getChunkFromChunkCoords(chunk.xCoord(), chunk.zCoord()));
+						ImageCache.update(player.worldObj, player.worldObj.getChunkFromChunkCoords(chunk.xCoord(), chunk.zCoord()));
 						Print.chat(sender, "&9Queued for map update.");
 						StateLogger.log(StateLogger.LoggerType.CHUNK, StateLogger.player(player) + " queued " + StateLogger.chunk(chunk) + " for map update.");
 					}
@@ -185,7 +185,7 @@ public class ChunkCmd extends CommandBase {
 									continue;
 								}
 								c++;
-								ImageCache.update(player.world, player.world.getChunkFromChunkCoords(x, z));
+								ImageCache.update(player.worldObj, player.worldObj.getChunkFromChunkCoords(x, z));
 							}
 						}
 						Print.chat(sender, "&2" + c + " &9chunks queued for map update.");
@@ -213,7 +213,7 @@ public class ChunkCmd extends CommandBase {
 						chunk.setType(ChunkType.NORMAL);
 						chunk.setPrice(net.fexcraft.mod.states.util.Config.DEFAULT_CHUNK_PRICE);
 						chunk.save();
-						ImageCache.update(player.world, player.world.getChunkFromChunkCoords(chunk.xCoord(), chunk.zCoord()));
+						ImageCache.update(player.worldObj, player.worldObj.getChunkFromChunkCoords(chunk.xCoord(), chunk.zCoord()));
 						Print.chat(sender, "&9Chunk unclaimed and resseted.");
 						StateLogger.log(StateLogger.LoggerType.CHUNK, StateLogger.player(player) + " unclaimed " + StateLogger.chunk(chunk) + ".");
 					}
@@ -235,7 +235,7 @@ public class ChunkCmd extends CommandBase {
 								ck.setPrice(net.fexcraft.mod.states.util.Config.DEFAULT_CHUNK_PRICE);
 								ck.save();
 								c++;
-								ImageCache.update(player.world, player.world.getChunkFromChunkCoords(x, z));
+								ImageCache.update(player.worldObj, player.worldObj.getChunkFromChunkCoords(x, z));
 							}
 						}
 						Print.chat(sender, "&2" + c + " &9chunks have been resseted.");
@@ -309,7 +309,7 @@ public class ChunkCmd extends CommandBase {
 							break;
 						}
 						case PRIVATE:{
-							receiver = player.world.getCapability(FSMMCapabilities.WORLD, null).getAccount("player:" + chunk.getOwner(), true, true);
+							receiver = player.worldObj.getCapability(FSMMCapabilities.WORLD, null).getAccount("player:" + chunk.getOwner(), true, true);
 							break;
 						}
 						case PUBLIC:
@@ -562,7 +562,7 @@ public class ChunkCmd extends CommandBase {
 								Print.chat(sender, "&cYou must be the owner of the Linked chunk aswel!");
 								return;
 							}
-							chunk.setLink(new ChunkPos(x, z));
+							chunk.setLink(new ChunkPos(x,0, z));
 							Print.chat(sender, "&6Chunk linked. ( " + x + " | " + z + " );");
 							StateLogger.log(StateLogger.LoggerType.CHUNK, StateLogger.player(player) + " linked " + StateLogger.chunk(chunk) + " to (" + x + ", " + z + ").");
 						}
@@ -690,7 +690,7 @@ public class ChunkCmd extends CommandBase {
 		boolean ismy = chunk.getDistrict().getMunicipality().getMayor() != null && chunk.getDistrict().getMunicipality().getMayor().equals(uuid);
 		boolean isst = chunk.getDistrict().getMunicipality().getState().getCouncil().contains(uuid) || (chunk.getDistrict().getMunicipality().getState().getLeader() != null && chunk.getDistrict().getMunicipality().getState().getLeader().equals(uuid));
 		boolean iscm = false;//TODO companies
-		Print.debug(isco, ismn, ismy, isst, iscm);
+		Print.debug(isco+"", ismn+"", ismy+"", isst+"", iscm+"");
 		switch(chunk.getType()){
 			case COMPANY: result = iscm || isst; break;
 			case DISTRICT: result = ismn || ismy || isst; break;
@@ -726,7 +726,7 @@ public class ChunkCmd extends CommandBase {
 		boolean ismy = chunk.getDistrict().getMunicipality().getMayor() != null && chunk.getDistrict().getMunicipality().getMayor().equals(uuid);
 		boolean isst = chunk.getDistrict().getMunicipality().getState().getCouncil().contains(uuid) || (chunk.getDistrict().getMunicipality().getState().getLeader() != null && chunk.getDistrict().getMunicipality().getState().getLeader().equals(uuid));
 		boolean iscm = false;//TODO companies
-		Print.debug(isco, ismn, ismy, isst, iscm);
+		Print.debug(isco+"", ismn+"", ismy+"", isst+"", iscm+"");
 		switch(chunk.getType()){
 			case COMPANY: result = iscm; break;
 			case DISTRICT: result = ismn || ismy || isst; break;
