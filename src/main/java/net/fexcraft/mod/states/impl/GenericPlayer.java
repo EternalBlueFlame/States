@@ -138,7 +138,7 @@ public class GenericPlayer implements PlayerCapability {
 
 	@Override
 	public String getFormattedNickname(){
-		return Formatter.format(Formatter.fromInt(color) + (nick == null ? entity.getName() : nick));
+		return Formatter.format(Formatter.fromInt(color) + (nick == null ? entity.getDisplayName() : nick));
 	}
 
 	@Override

@@ -40,12 +40,12 @@ public class DistrictCmd extends CommandBase {
 	}
 
 	@Override
-	public String getUsage(ICommandSender sender){
+	public String getCommandUsage(ICommandSender sender){
 		return "/dis";
 	}
 	
 	@Override
-    public boolean checkPermission(MinecraftServer server, ICommandSender sender){
+    public boolean canCommandSenderUseCommand(ICommandSender sender){
         return sender != null;
     }
 	
@@ -55,7 +55,7 @@ public class DistrictCmd extends CommandBase {
     }
 
 	@Override
-	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
+	public void processCommand(ICommandSender sender, String[] args) throws CommandException {
 		if(args.length == 0){
 			Print.chat(sender, "&7/dis info");
 			Print.chat(sender, "&7/dis types");
@@ -64,7 +64,7 @@ public class DistrictCmd extends CommandBase {
 			Print.chat(sender, "&7/dis set <option> <value>");
 			return;
 		}
-		EntityPlayer player = (EntityPlayer)sender.getCommandSenderEntity();
+		EntityPlayer player = (EntityPlayer)sender;
 		PlayerCapability ply = player.getCapability(StatesCapabilities.PLAYER, null);
 		if(ply == null){
 			Print.chat(sender, "&4Error loading Playerdata.");
@@ -388,9 +388,9 @@ public class DistrictCmd extends CommandBase {
 								newdis.save();
 								chunk.save();
 								States.DISTRICTS.put(newdis.getId(), newdis);
-								StateUtil.announce(server, "&9New District was created!");
-								StateUtil.announce(server, "&9Created by " + ply.getFormattedNickname());
-								StateUtil.announce(server, "&9Name&0: &7" + newdis.getName());
+								StateUtil.announce(MinecraftServer.getServer(), "&9New District was created!");
+								StateUtil.announce(MinecraftServer.getServer(), "&9Created by " + ply.getFormattedNickname());
+								StateUtil.announce(MinecraftServer.getServer(), "&9Name&0: &7" + newdis.getName());
 								StateLogger.log(StateLogger.LoggerType.DISRICT, StateLogger.player(player) + " created " + StateLogger.district(newdis) + " at " + StateLogger.chunk(chunk) + ".");
 								return;
 							}
@@ -398,8 +398,8 @@ public class DistrictCmd extends CommandBase {
 					}
 					catch(Exception e){
 						Print.chat(sender, "Error: " + e.getMessage());
-						Print.chat(sender, e);
-						Print.debug(e);
+						Print.chat(sender, e.getMessage());
+						Print.debug(e.getMessage());
 						return;
 					}
 				}

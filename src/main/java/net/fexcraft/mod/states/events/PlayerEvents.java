@@ -37,10 +37,10 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntitySign;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.IChatComponent;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraftforge.event.ServerChatEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -89,16 +89,16 @@ public class PlayerEvents {
 	
 	@SubscribeEvent
 	public static void onRespawn(PlayerEvent.Clone event){
-		event.getEntityPlayer().getCapability(StatesCapabilities.PLAYER, null)
+		event.entityPlayer.getCapability(StatesCapabilities.PLAYER, null)
 			.copyFromOld(event.getOriginal().getCapability(StatesCapabilities.PLAYER, null));
-		States.PLAYERS.put(event.getEntityPlayer().getGameProfile().getId(),
-			event.getEntityPlayer().getCapability(StatesCapabilities.PLAYER, null));
-		MessageSender.toWebhook(null, event.getEntityPlayer().getGameProfile().getName() + " respawned.");
+		States.PLAYERS.put(event.entityPlayer.getGameProfile().getId(),
+			event.entityPlayer.getCapability(StatesCapabilities.PLAYER, null));
+		MessageSender.toWebhook(null, event.entityPlayer.getGameProfile().getName() + " respawned.");
 	}
 	
 	@SubscribeEvent
 	public static void onRickClickBlock(PlayerInteractEvent.RightClickBlock event){
-		if(event.world.isRemote || event.getEntityPlayer().dimension != 0 || event.getEntityPlayer().getActiveHand() == EnumHand.OFF_HAND){
+		if(event.world.isRemote || event.entityPlayer.dimension != 0){
 			return;
 		}
 		IBlockState state = event.world.getBlockState(event.getPos());
@@ -114,7 +114,7 @@ public class PlayerEvents {
 				if(cap != null){ cap.setup(chunk); }
 			}
 			else if(cap != null && cap.isStatesSign()){
-				cap.onPlayerInteract(chunk, event.getEntityPlayer());
+				cap.onPlayerInteract(chunk, event.entityPlayer);
 			}
 			else return;
 		}
@@ -123,8 +123,8 @@ public class PlayerEvents {
 				|| state.getBlock() instanceof BlockDropper || state.getBlock() instanceof BlockLever
 				|| state.getBlock() instanceof BlockButton || state.getBlock() instanceof BlockPressurePlate
 				|| state.getBlock() instanceof BlockRedstoneRepeater || state.getBlock() instanceof BlockRedstoneComparator){
-			if(!checkAccess(event.world, event.getPos(), state, event.getEntityPlayer())){
-				Print.chat(event.getEntityPlayer(), "No permission to interact with these blocks here.");
+			if(!checkAccess(event.world, event.getPos(), state, event.entityPlayer)){
+				Print.chat(event.entityPlayer, "No permission to interact with these blocks here.");
 				event.setCanceled(true);
 				return;
 			}
@@ -134,9 +134,9 @@ public class PlayerEvents {
 	
 	@SubscribeEvent
 	public static void onBlockBreak(BlockEvent.BreakEvent event){
-		if(event.player.dimension != 0){ return; }
-		if(!checkAccess(event.world, event.getPos(), event.getState(), event.getPlayer())){
-			Print.bar(event.player, "No permission to break blocks here.");
+		if(event.getPlayer().dimension != 0){ return; }
+		if(!checkAccess(event.world, event.x,event.y,event.z, event.getPlayer())){
+			Print.bar(event.getPlayer(), "No permission to break blocks here.");
 			event.setCanceled(true);
 		}
 		return;
@@ -145,16 +145,16 @@ public class PlayerEvents {
 	@SubscribeEvent
 	public static void onBlockPlace(BlockEvent.PlaceEvent event){
 		if(event.player.dimension != 0){ return; }
-		if(!checkAccess(event.world, event.getPos(), event.getState(), event.player)){
+		if(!checkAccess(event.world, event.x,event.y,event.z, event.player)){
 			Print.bar(event.player, "No permission to place blocks here.");
 			event.setCanceled(true);
 		}
 		return;
 	}
 	
-	public static boolean checkAccess(World world, BlockPos pos, IBlockState state, EntityPlayer player){
+	public static boolean checkAccess(World world, int posX, int posY, int posZ, EntityPlayer player){
 		if(StateUtil.isAdmin(player)){ return true; }
-		Chunk chunk = StateUtil.getChunk(pos);
+		Chunk chunk = StateUtil.getChunk(posX,posZ);
 		if(chunk.getDistrict().getId() < 0){
 			if(chunk.getDistrict().getId() == -1){
 				if(Config.ALLOW_WILDERNESS_ACCESS){
@@ -171,7 +171,7 @@ public class PlayerEvents {
 					Print.chat(player, "Updating chunk...");
 						return false;
 				}
-				if(pos.getY() > Config.TRANSIT_ZONE_BOTTOM_LIMIT && pos.getY() < Config.TRANSIT_ZONE_TOP_LIMIT){
+				if(posY > Config.TRANSIT_ZONE_BOTTOM_LIMIT && posY < Config.TRANSIT_ZONE_TOP_LIMIT){
 					chunk.setEdited(Time.getDate());
 					return true;
 				}
@@ -226,15 +226,15 @@ public class PlayerEvents {
 	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public static void onMessage(ServerChatEvent event){
 		if(!Config.STATES_CHAT){
-			MessageSender.toWebhook(event.player.getCapability(StatesCapabilities.PLAYER, null), event.getMessage());
+			MessageSender.toWebhook(event.player.getCapability(StatesCapabilities.PLAYER, null), event.message);
 			return;
 		}
 		//event.setCanceled(true); Static.getServer().addScheduledTask(() -> { Sender.sendAs(event.player, event.getMessage()); });
-		PlayerCapability cap = event.player.getCapability(StatesCapabilities.PLAYER, null); TextComponentTranslation com = (TextComponentTranslation)event.getComponent();
-		com.getFormatArgs()[0] = new TextComponentString(Formatter.format("&" + (StateUtil.isAdmin(event.player) ? "4" : "6") + "#&8] " + cap.getFormattedNickname() + "&0:"));
-		com.getFormatArgs()[1] = new TextComponentString(Formatter.format("&7" + ((ITextComponent)com.getFormatArgs()[1]).getUnformattedText()));
-		event.setComponent(new TextComponentTranslation("states.chat.text", com.getFormatArgs()));
-		MessageSender.toWebhook(cap, event.getMessage());
+		PlayerCapability cap = event.player.getCapability(StatesCapabilities.PLAYER, null); ChatComponentTranslation com = event.component;
+		com.getFormatArgs()[0] = new ChatComponentText(Formatter.format("&" + (StateUtil.isAdmin(event.player) ? "4" : "6") + "#&8] " + cap.getFormattedNickname() + "&0:"));
+		com.getFormatArgs()[1] = new ChatComponentText(Formatter.format("&7" + ((IChatComponent)com.getFormatArgs()[1]).getUnformattedText()));
+		event.component =(new ChatComponentTranslation("states.chat.text", com.getFormatArgs()));
+		MessageSender.toWebhook(cap, event.message);
 	}
 	
 	@SubscribeEvent

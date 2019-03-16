@@ -48,7 +48,7 @@ public class ChunkCapabilityUtil implements ICapabilitySerializable<NBTBase>{
         
         @Override
         public NBTBase writeNBT(Capability<ChunkCapability> capability, ChunkCapability instance, EnumFacing side){
-            return new NBTTagString(instance == null ? "" : instance.getStatesChunk() == null ? instance.getChunk().x + "_" + instance.getChunk().z : instance.getStatesChunk().toString());
+            return new NBTTagString(instance == null ? "" : instance.getStatesChunk() == null ? instance.getChunk().xPosition + "_" + instance.getChunk().zPosition : instance.getStatesChunk().toString());
             //I know this is nonsense, but else chunks kept getting errors and didn't save.
         }
         

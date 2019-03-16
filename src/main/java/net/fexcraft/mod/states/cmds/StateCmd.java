@@ -38,17 +38,17 @@ import net.minecraft.server.MinecraftServer;
 public class StateCmd extends CommandBase {
 	
 	@Override
-	public String getName(){
+	public String getCommandName(){
 		return "st";
 	}
 
 	@Override
-	public String getUsage(ICommandSender sender){
+	public String getCommandUsage(ICommandSender sender){
 		return "/st";
 	}
 	
 	@Override
-    public boolean checkPermission(MinecraftServer server, ICommandSender sender){
+    public boolean canCommandSenderUseCommand(ICommandSender sender){
         return sender != null;
     }
 	
@@ -58,7 +58,7 @@ public class StateCmd extends CommandBase {
     }
 
 	@Override
-	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
+	public void processCommand(ICommandSender sender, String[] args) throws CommandException {
 		if(args.length == 0){
 			Print.chat(sender, "&7/st info");
 			Print.chat(sender, "&7/st set <option> <value>");
@@ -238,7 +238,7 @@ public class StateCmd extends CommandBase {
 							}
 							state.setCapitalId(mun.getId());
 							state.setChanged(Time.getDate());
-							StateUtil.announce(server, AnnounceLevel.STATE_ALL, "&6" + mun.getName() + " &9 is now the new Capital!", state.getId());
+							StateUtil.announce(MinecraftServer.getServer(), AnnounceLevel.STATE_ALL, "&6" + mun.getName() + " &9 is now the new Capital!", state.getId());
 							StateLogger.log(StateLogger.LoggerType.STATE, StateLogger.player(player) + " set the capital of " + StateLogger.state(state) + " to " + StateLogger.municipality(mun));
 							return;
 						}
@@ -356,7 +356,7 @@ public class StateCmd extends CommandBase {
 						}
 						state.getCouncil().remove(ply.getUUID());
 						state.save();
-						StateUtil.announce(server, AnnounceLevel.MUNICIPALITY, ply.getFormattedNickname() + " &9left the State Council!", state.getId());
+						StateUtil.announce(MinecraftServer.getServer(), AnnounceLevel.MUNICIPALITY, ply.getFormattedNickname() + " &9left the State Council!", state.getId());
 						StateLogger.log(StateLogger.LoggerType.STATE, StateLogger.player(player) + " left the council of " + StateLogger.state(state) + ".");
 					}
 					case "invite":{
@@ -465,7 +465,7 @@ public class StateCmd extends CommandBase {
 							mun.setState(StateUtil.getState(-1));
 							mun.setChanged(Time.getDate());
 							mun.save();
-							StateUtil.announce(server, AnnounceLevel.STATE, "Municipality of " + mun.getName() + " was removed from our State!", state.getId());
+							StateUtil.announce(MinecraftServer.getServer(), AnnounceLevel.STATE, "Municipality of " + mun.getName() + " was removed from our State!", state.getId());
 							StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, StateLogger.player(player) + " kicked " + StateLogger.municipality(mun) + " from the State of " + StateLogger.state(state));
 						}
 						else{
@@ -529,9 +529,9 @@ public class StateCmd extends CommandBase {
 							ply.getMunicipality().setState(newstate);
 							ply.getMunicipality().setChanged(Time.getDate());
 							ply.getMunicipality().save();
-							StateUtil.announce(server, "&9New State was created!");
-							StateUtil.announce(server, "&9Created by " + ply.getFormattedNickname());
-							StateUtil.announce(server, "&9Name&0: &7" + newstate.getName());
+							StateUtil.announce(MinecraftServer.getServer(), "&9New State was created!");
+							StateUtil.announce(MinecraftServer.getServer(), "&9Created by " + ply.getFormattedNickname());
+							StateUtil.announce(MinecraftServer.getServer(), "&9Name&0: &7" + newstate.getName());
 							StateLogger.log(StateLogger.LoggerType.STATE, StateLogger.player(player) + " created " + StateLogger.state(newstate) + ".");
 						}
 					}

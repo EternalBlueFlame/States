@@ -28,11 +28,11 @@ public class WelcomeGui extends GuiContainer {
 		super(new PlaceholderContainer());
 		xSize = 256; ySize = 200;
 		//
-		Chunk chunk = world.getChunkFromBlockCoords(new BlockPos(x, y, z));
+		Chunk chunk = world.getChunkFromBlockCoords(x, z);
 		int i = 0;
 		for(int j = -3; j < 4; j++){
 			for(int k = -3; k < 4; k++){
-				rss[i++] = ImageUtil.getTempChunkImage(world, chunk.x + j, chunk.z + k);
+				rss[i++] = ImageUtil.getTempChunkImage(world, chunk.xPosition + j, chunk.zPosition + k);
 			}
 		}
 	}
@@ -58,7 +58,7 @@ public class WelcomeGui extends GuiContainer {
 				int x = this.guiLeft + 119 + (i * 18);
 				int y = this.guiTop + 62 + (j * 18);
 				//
-		        Tessellator tessellator = Tessellator.getInstance();
+		        Tessellator tessellator = Tessellator.instance;
 		        BufferBuilder bufferbuilder = tessellator.getBuffer();
 		        bufferbuilder.begin(7, DefaultVertexFormats.POSITION_TEX);
 		        bufferbuilder.pos((double)(x + 0), (double)(y + 16), (double)this.zLevel).tex((double)((float)(0 + 0) * 0.00390625F), (double)((float)(0 + 256) * 0.00390625F)).endVertex();

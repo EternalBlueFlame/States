@@ -41,17 +41,17 @@ import net.minecraft.server.MinecraftServer;
 public class MunicipalityCmd extends CommandBase {
 	
 	@Override
-	public String getName(){
+	public String getCommandName(){
 		return "mun";
 	}
 
 	@Override
-	public String getUsage(ICommandSender sender){
+	public String getCommandUsage(ICommandSender sender){
 		return "/mun";
 	}
 	
 	@Override
-    public boolean checkPermission(MinecraftServer server, ICommandSender sender){
+    public boolean canCommandSenderUseCommand(ICommandSender sender){
         return sender != null;
     }
 	
@@ -61,7 +61,7 @@ public class MunicipalityCmd extends CommandBase {
     }
 
 	@Override
-	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
+	public void processCommand(ICommandSender sender, String[] args) throws CommandException {
 		if(args.length == 0){
 			Print.chat(sender, "&7/mun info");
 			Print.chat(sender, "&7/mun types");
@@ -77,7 +77,7 @@ public class MunicipalityCmd extends CommandBase {
 			Print.chat(sender, "&7/mun create <name...>");
 			return;
 		}
-		EntityPlayer player = (EntityPlayer)sender.getCommandSenderEntity();
+		EntityPlayer player = (EntityPlayer)sender;
 		PlayerCapability ply = player.getCapability(StatesCapabilities.PLAYER, null);
 		if(ply == null){
 			Print.chat(sender, "&o&4There was an error loading your Playerdata.");
@@ -156,7 +156,7 @@ public class MunicipalityCmd extends CommandBase {
 								mun.getState().save();
 							}
 							else{
-								StateUtil.announce(server, "&7The state of &6" + mun.getState().getName() + " has been disbanned!");
+								StateUtil.announce(MinecraftServer.getServer(), "&7The state of &6" + mun.getState().getName() + " has been disbanned!");
 							}
 						}
 						mun.setState(playerstate);
@@ -166,8 +166,8 @@ public class MunicipalityCmd extends CommandBase {
 						mun.setPrice(0);
 						mun.save();
 						mun.getState().save();
-						StateUtil.announce(server, AnnounceLevel.MUNICIPALITY_ALL, "&6Municipality has been bought!", ply.getMunicipality().getId());
-						StateUtil.announce(server, AnnounceLevel.MUNICIPALITY_ALL, "&9Buyer: " + playerstate.getName() + " (" + playerstate.getId() + ");", ply.getMunicipality().getId());
+						StateUtil.announce(MinecraftServer.getServer(), AnnounceLevel.MUNICIPALITY_ALL, "&6Municipality has been bought!", ply.getMunicipality().getId());
+						StateUtil.announce(MinecraftServer.getServer(), AnnounceLevel.MUNICIPALITY_ALL, "&9Buyer: " + playerstate.getName() + " (" + playerstate.getId() + ");", ply.getMunicipality().getId());
 						StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, StateLogger.player(player) + " bought " + StateLogger.municipality(mun) + ", it is now part of " + StateLogger.state(mun.getState()) + ".");
 					}
 				}
@@ -401,7 +401,7 @@ public class MunicipalityCmd extends CommandBase {
 						}
 						mun.getCouncil().remove(gp.getId());
 						mun.save();
-						StateUtil.announce(server, AnnounceLevel.MUNICIPALITY, gp.getName() + " &9was removed from the Municipality Council!", mun.getId());
+						StateUtil.announce(MinecraftServer.getServer(), AnnounceLevel.MUNICIPALITY, gp.getName() + " &9was removed from the Municipality Council!", mun.getId());
 						StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, StateLogger.player(player) + " removed " + StateLogger.player(gp) + " from the council of " + StateLogger.municipality(mun) + ".");
 						break;
 					}
@@ -412,7 +412,7 @@ public class MunicipalityCmd extends CommandBase {
 						}
 						mun.getCouncil().remove(ply.getUUID());
 						mun.save();
-						StateUtil.announce(server, AnnounceLevel.MUNICIPALITY, ply.getFormattedNickname() + " &9left the Municipality Council!", mun.getId());
+						StateUtil.announce(MinecraftServer.getServer(), AnnounceLevel.MUNICIPALITY, ply.getFormattedNickname() + " &9left the Municipality Council!", mun.getId());
 						StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, StateLogger.player(player) + " left of the council of " + StateLogger.municipality(mun) + ".");
 					}
 					case "invite":{
@@ -577,12 +577,12 @@ public class MunicipalityCmd extends CommandBase {
 				if(!ply.canLeave(sender)){
 					return;
 				}
-				MailUtil.send(sender, RecipientType.MUNICIPALITY, ply.getMunicipality().getId(), sender.getName(), player.getGameProfile().getName() + " left the Municipality. At " + Time.getAsString(-1), MailType.SYSTEM);
-				StateUtil.announce(server, AnnounceLevel.MUNICIPALITY, "&o" + ply.getFormattedNickname() + " &e&oleft the Municipality!", ply.getMunicipality().getId());
+				MailUtil.send(sender, RecipientType.MUNICIPALITY, ply.getMunicipality().getId(), sender.getCommandSenderName(), player.getGameProfile().getName() + " left the Municipality. At " + Time.getAsString(-1), MailType.SYSTEM);
+				StateUtil.announce(MinecraftServer.getServer(), AnnounceLevel.MUNICIPALITY, "&o" + ply.getFormattedNickname() + " &e&oleft the Municipality!", ply.getMunicipality().getId());
 				StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, StateLogger.player(player) + " left " + StateLogger.municipality(ply.getMunicipality()) + ".");
 				ply.setMunicipality(mun);
-				MailUtil.send(sender, RecipientType.MUNICIPALITY, ply.getMunicipality().getId(), sender.getName(), player.getGameProfile().getName() + " joined the Municipality. At " + Time.getAsString(-1), MailType.SYSTEM);
-				StateUtil.announce(server, AnnounceLevel.MUNICIPALITY, "&o" + ply.getFormattedNickname() + " &2&ojoined the Municipality!", ply.getMunicipality().getId());
+				MailUtil.send(sender, RecipientType.MUNICIPALITY, ply.getMunicipality().getId(), sender.getCommandSenderName(), player.getGameProfile().getName() + " joined the Municipality. At " + Time.getAsString(-1), MailType.SYSTEM);
+				StateUtil.announce(MinecraftServer.getServer(), AnnounceLevel.MUNICIPALITY, "&o" + ply.getFormattedNickname() + " &2&ojoined the Municipality!", ply.getMunicipality().getId());
 				StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, StateLogger.player(player) + " joined " + StateLogger.municipality(ply.getMunicipality()) + ".");
 				return;
 			}
@@ -710,9 +710,9 @@ public class MunicipalityCmd extends CommandBase {
 								chunk.setPrice(0);
 								chunk.setClaimer(ply.getUUID());
 								ply.setMunicipality(newmun);
-								StateUtil.announce(server, "&9New Municipality and District was created!");
-								StateUtil.announce(server, "&9Created by " + ply.getFormattedNickname());
-								StateUtil.announce(server, "&9Name&0: &7" + newmun.getName());
+								StateUtil.announce(MinecraftServer.getServer(), "&9New Municipality and District was created!");
+								StateUtil.announce(MinecraftServer.getServer(), "&9Created by " + ply.getFormattedNickname());
+								StateUtil.announce(MinecraftServer.getServer(), "&9Name&0: &7" + newmun.getName());
 								StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, StateLogger.player(player) + " created " + StateLogger.municipality(newmun) + " at " + StateLogger.chunk(chunk) + ".");
 								StateLogger.log(StateLogger.LoggerType.DISRICT, StateLogger.player(player) + " created " + StateLogger.district(newdis) + " at " + StateLogger.chunk(chunk) + ".");
 								StateLogger.log(StateLogger.LoggerType.DISRICT, StateLogger.player(player) + " created a Municipality at " + StateLogger.chunk(chunk) + ".");
@@ -722,8 +722,8 @@ public class MunicipalityCmd extends CommandBase {
 				}
 				catch(Exception e){
 					Print.chat(sender, "Error: " + e.getMessage());
-					Print.chat(sender, e);
-					Print.debug(e);
+					Print.chat(sender, e.getMessage());
+					Print.debug(e.getMessage());
 				}
 				return;
 			}

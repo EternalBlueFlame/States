@@ -9,6 +9,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
@@ -30,11 +31,11 @@ public class LocationUpdate extends GuiScreen {
 	
 	@SubscribeEvent
 	public void displayLocationUpdate(RenderGameOverlayEvent event){
-		if(event.getType() == ElementType.HOTBAR && shown()){
+		if(event.type == ElementType.HOTBAR && shown()){
 			if(client == null){ client = Minecraft.getMinecraft(); }
-			ModelBase.bindTexture(texture);
+			Minecraft.getMinecraft().getTextureManager().bindTexture(texture);
 			THIS.drawTexturedModalRect(0, 0, 0, 0, 256, 38);
-			Tessellator tessellator = Tessellator.getInstance();
+			Tessellator tessellator = Tessellator.instance;
 	        BufferBuilder bufferbuilder = tessellator.getBuffer();
 			//
 			if(icon[0] == null){
@@ -77,9 +78,9 @@ public class LocationUpdate extends GuiScreen {
 		        bufferbuilder.pos((x + 0),     (y + 0),      THIS.zLevel).tex(0, 0).endVertex();
 		        tessellator.draw();
 			}
-			client.fontRenderer.drawString(Formatter.format(lines[0]), 56,  3, MapColor.SNOW.colorValue);
-			client.fontRenderer.drawString(Formatter.format(lines[1]), 56, 15, MapColor.SNOW.colorValue);
-			client.fontRenderer.drawString(Formatter.format(lines[2]), 56, 27, MapColor.SNOW.colorValue);
+			client.fontRenderer.drawString(Formatter.format(lines[0]), 56,  3, MapColor.snowColor.colorValue);
+			client.fontRenderer.drawString(Formatter.format(lines[1]), 56, 15, MapColor.snowColor.colorValue);
+			client.fontRenderer.drawString(Formatter.format(lines[2]), 56, 27, MapColor.snowColor.colorValue);
 		}
 		
 	}

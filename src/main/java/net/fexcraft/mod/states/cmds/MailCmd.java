@@ -28,23 +28,24 @@ import net.minecraft.event.ClickEvent;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.ResourceLocation;
 
 @fCommand
 public class MailCmd extends CommandBase {
 
     @Override
-    public String getName(){
+    public String getCommandName(){
         return "mail";
     }
 
     @Override
-    public String getUsage(ICommandSender sender){
+    public String getCommandUsage(ICommandSender sender){
 	return "/mail";
     }
     
     @Override
-    public boolean checkPermission(MinecraftServer server, ICommandSender sender){
+    public boolean canCommandSenderUseCommand(ICommandSender sender){
         return sender != null;
     }
 	
@@ -54,7 +55,7 @@ public class MailCmd extends CommandBase {
     }
 
 	@Override
-	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
+	public void processCommand(ICommandSender sender, String[] args) throws CommandException {
 		if(args.length == 0){
 			Print.chat(sender, "&7/mail inbox");
 			Print.chat(sender, "&7/mail read");
@@ -81,13 +82,13 @@ public class MailCmd extends CommandBase {
 				return;
 			}
 			case "read":{
-				if(!player.getHeldItemMainhand().isEmpty()){
-					ItemStack stack = player.getHeldItemMainhand();
+				if(player.getHeldItem() !=null){
+					ItemStack stack = player.getHeldItem();
 					if(stack.getItem() instanceof MailItem == false){
 						Print.chat(player, "Not a valid Mail Item in hand."); return;
 					}
-					else if(stack.getTagCompound() == null || stack.getMetadata() < 2){
-						if(stack.getMetadata() == 1){
+					else if(stack.getTagCompound() == null || stack.getItemDamage() < 2){
+						if(stack.getItemDamage() == 1){
 							Print.chat(player, "Mail expired, it cannot be read anymore."); return;
 						}
 						Print.chat(player, "Item has no data to read."); return;
@@ -127,11 +128,11 @@ public class MailCmd extends CommandBase {
 					Print.chat(player, stack.getTagCompound().getString("Content"));
 					Print.chat(player, "&cExpires: &7" + Time.getAsString(stack.getTagCompound().getLong("Expiry")));
 					if(str.toLowerCase().equals("invite") && stack.getTagCompound().hasKey("StatesData")){
-						TextComponentString text = new TextComponentString(Formatter.format("&a&l[ACCEPT] "));
-						text.getStyle().setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/mail accept"));
-						TextComponentString text2 = new TextComponentString(Formatter.format(" &c&l[DENY]"));
-						text2.getStyle().setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/mail deny"));
-						sender.sendMessage(text.appendSibling(text2));
+						ChatComponentText text = new ChatComponentText(Formatter.format("&a&l[ACCEPT] "));
+						text.getChatStyle().setChatClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/mail accept"));
+						ChatComponentText text2 = new ChatComponentText(Formatter.format(" &c&l[DENY]"));
+						text2.getChatStyle().setChatClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/mail deny"));
+						sender.addChatMessage(text.appendSibling(text2));
 					}
 					Print.chat(player, "&e====-====-====-====-====-====" + States.PREFIX);
 				}
@@ -180,19 +181,19 @@ public class MailCmd extends CommandBase {
 			}
 			case "accept": case "deny": {
 				try{
-					if(player.getHeldItemMainhand().isEmpty()){
+					if(player.getHeldItem()==null){
 						Print.chat(player, "No mail item in hand.");
 					}
-					ItemStack stack = player.getHeldItemMainhand();
+					ItemStack stack = player.getHeldItem();
 					if(stack.getItem() instanceof MailItem == false){
 						Print.chat(player, "Not a valid Mail Item in hand."); return;
 					}
-					else if(stack.getTagCompound() == null || stack.getMetadata() != 3){
+					else if(stack.getTagCompound() == null || stack.getItemDamage() != 3){
 						Print.chat(player, "Item in hand is not an Invite Mail."); return;
 					}
 					else if(!stack.getTagCompound().getString("Receiver").replace("player:", "").equals(player.getGameProfile().getId().toString())){
 						Print.chat(player, "Receiver and your UUID do not match.");
-						if(Static.dev()){
+						if(Print.dev()){
 							Print.chat(player, stack.getTagCompound().getString("Receiver"));
 							Print.chat(player, player.getGameProfile().getId().toString());
 						}
@@ -229,11 +230,11 @@ public class MailCmd extends CommandBase {
 									Print.chat(sender, "&cYou are blacklisted in this Municipality.");
 									return;
 								}
-								StateUtil.announce(server, AnnounceLevel.MUNICIPALITY, "&o" + cap.getFormattedNickname() + " &e&oleft the Municipality!", cap.getMunicipality().getId());
+								StateUtil.announce(MinecraftServer.getServer(), AnnounceLevel.MUNICIPALITY, "&o" + cap.getFormattedNickname() + " &e&oleft the Municipality!", cap.getMunicipality().getId());
 								StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, StateLogger.player(player) + " left " + StateLogger.municipality(cap.getMunicipality()) + ".");
 								cap.setMunicipality(mun);
 								cap.save(); mun.save();
-								StateUtil.announce(server, AnnounceLevel.MUNICIPALITY, "&o" + cap.getFormattedNickname() + " &2&ojoined the Municipality!", cap.getMunicipality().getId());
+								StateUtil.announce(MinecraftServer.getServer(), AnnounceLevel.MUNICIPALITY, "&o" + cap.getFormattedNickname() + " &2&ojoined the Municipality!", cap.getMunicipality().getId());
 								StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, StateLogger.player(player) + " joined " + StateLogger.municipality(cap.getMunicipality()) + ".");
 								break;
 							}
@@ -249,7 +250,7 @@ public class MailCmd extends CommandBase {
 								}
 								mun.getCouncil().add(cap.getUUID());
 								mun.save();
-								StateUtil.announce(server, AnnounceLevel.MUNICIPALITY, cap.getFormattedNickname() + " joined the Coucil of our Municipality!", mun.getId());
+								StateUtil.announce(MinecraftServer.getServer(), AnnounceLevel.MUNICIPALITY, cap.getFormattedNickname() + " joined the Coucil of our Municipality!", mun.getId());
 								StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, StateLogger.player(player) + " joined to the council of " + StateLogger.municipality(mun) + ".");
 								break;
 							}
@@ -265,7 +266,7 @@ public class MailCmd extends CommandBase {
 								}
 								state.getCouncil().add(cap.getUUID());
 								state.save();
-								StateUtil.announce(server, AnnounceLevel.STATE, cap.getFormattedNickname() + " joined the Coucil of our State!", state.getId());
+								StateUtil.announce(MinecraftServer.getServer(), AnnounceLevel.STATE, cap.getFormattedNickname() + " joined the Coucil of our State!", state.getId());
 								StateLogger.log(StateLogger.LoggerType.STATE, StateLogger.player(player) + " joined to the council of " + StateLogger.state(state) + ".");
 								break;
 							}
@@ -284,7 +285,7 @@ public class MailCmd extends CommandBase {
 									return;
 								}
 								cap.getMunicipality().setState(state);
-								StateUtil.announce(server, AnnounceLevel.STATE, "Municipality of " + cap.getMunicipality().getName() + " joined our State!", state.getId());
+								StateUtil.announce(MinecraftServer.getServer(), AnnounceLevel.STATE, "Municipality of " + cap.getMunicipality().getName() + " joined our State!", state.getId());
 								StateLogger.log(StateLogger.LoggerType.STATE, StateLogger.player(player) + " >>> " + StateLogger.municipality(cap.getMunicipality()) + " joined the State of " + StateLogger.state(state));
 								break;
 							}

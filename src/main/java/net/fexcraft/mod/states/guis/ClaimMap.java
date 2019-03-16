@@ -4,11 +4,11 @@ import java.awt.Color;
 import java.util.ArrayList;
 
 import net.fexcraft.lib.common.math.RGB;
-import net.fexcraft.lib.mc.network.PacketHandler;
 import net.fexcraft.lib.mc.network.packet.PacketNBTTagCompound;
-import net.fexcraft.lib.mc.utils.Formatter;
 import net.fexcraft.mod.fsmm.util.Print;
 import net.fexcraft.mod.fsmm.util.Config;
+import net.fexcraft.mod.lib.fcl.Formatter;
+import net.fexcraft.mod.lib.fcl.PacketHandler;
 import net.fexcraft.mod.states.util.ImageUtil;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.client.Minecraft;
@@ -21,6 +21,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class ClaimMap extends GuiContainer {
@@ -53,7 +54,7 @@ public class ClaimMap extends GuiContainer {
 	protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY){
 		this.mc.getTextureManager().bindTexture(texture);
 		this.drawTexturedModalRect((this.width - xSize) / 2, (this.height - ySize) / 2, 0, 0, xSize, ySize);
-		this.fontRenderer.drawStringWithShadow(result, 7, 7, MapColor.SNOW.colorValue);
+		this.fontRendererObj.drawStringWithShadow(result, 7, 7, MapColor.snowColor.colorValue);
 	}
 	
 	@Override
@@ -98,7 +99,7 @@ public class ClaimMap extends GuiContainer {
 		compound.setInteger("from", 10);
 		compound.setString("request", "claim");
 		compound.setIntArray("data", new int[] { district, x, z, mode });
-		Print.debug(compound);
+		Print.debug(compound.toString());
 		PacketHandler.getInstance().sendToServer(new PacketNBTTagCompound(compound));
 	}
 
@@ -109,7 +110,7 @@ public class ClaimMap extends GuiContainer {
 		compound.setString("request", "get_map");
 		compound.setInteger("district", district);
 		//compound.setIntArray("pos", new int[] { x, y, z });
-		Print.debug(compound);
+		Print.debug(compound.toString());
 		PacketHandler.getInstance().sendToServer(new PacketNBTTagCompound(compound));
 	}
 
@@ -128,11 +129,11 @@ public class ClaimMap extends GuiContainer {
 		private RGB temprgb;
 		
 		@Override
-		public void drawButton(Minecraft mc, int mouseX, int mouseY, float partialTicks){
+		public void drawButton(Minecraft mc, int mouseX, int mouseY){
 			if(!visible){ return; }
 			//mc.getTextureManager().bindTexture(texture);
-            this.hovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
-            xx = mouseX - x; yy = mouseY - this.y;
+            this.hovered = mouseX >= this.xPosition && mouseY >= this.yPosition && mouseX < this.xPosition + this.width && mouseY < this.yPosition + this.height;
+            xx = mouseX - xPosition; yy = mouseY - this.yPosition;
             if(xx >= 110){ xx = -1; } if(yy >= 110){ yy = -1; }
             if(list == null){ return; }
             m = -1;
@@ -145,8 +146,8 @@ public class ClaimMap extends GuiContainer {
     			m = l + (k * 11);
             }
             int k = 0;
-            cx = (mc.player.getPosition().getX() >> 4) - 5;
-            cz = (mc.player.getPosition().getZ() >> 4) - 5;
+            cx = (new BlockPos(mc.thePlayer).getX() >> 4) - 5;
+            cz = (new BlockPos(mc.thePlayer).getZ() >> 4) - 5;
             for(int j = 0; j < 11; j++){
             	for(int i = 0; i < 11; i++){
             		if(m == k){

@@ -32,12 +32,12 @@ import net.minecraft.util.math.BlockPos;
 public class DebugCmd extends CommandBase {
     
     @Override
-    public String getName(){
+    public String getCommandName(){
         return "st-debug";
     }
     
     @Override
-    public String getUsage(ICommandSender sender){
+    public String getCommandUsage(ICommandSender sender){
         return "/st-debug";
     }
     
@@ -49,7 +49,7 @@ public class DebugCmd extends CommandBase {
     private long lastcheck;
     
     @Override
-    public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
+    public void processCommand(ICommandSender sender, String[] args) throws CommandException {
         if(args.length == 0){
             Print.chat(sender, "&7/st-debug chunk");
             Print.chat(sender, "&7/st-debug chunks");

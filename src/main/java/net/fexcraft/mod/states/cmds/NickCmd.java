@@ -17,17 +17,17 @@ import net.minecraft.server.MinecraftServer;
 public class NickCmd extends CommandBase {
 
 	@Override
-	public String getName(){
+	public String getCommandName(){
 		return "nick";
 	}
 
 	@Override
-	public String getUsage(ICommandSender sender){
+	public String getCommandUsage(ICommandSender sender){
 		return "/nick";
 	}
 	
 	@Override
-    public boolean checkPermission(MinecraftServer server, ICommandSender sender){
+    public boolean canCommandSenderUseCommand(ICommandSender sender){
         return sender != null;
     }
 	
@@ -37,7 +37,7 @@ public class NickCmd extends CommandBase {
     }
 
 	@Override
-	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
+	public void processCommand(ICommandSender sender, String[] args) throws CommandException {
 		if(args.length == 0){
 			Print.chat(sender, "&7/nick name <nickname>");
 			Print.chat(sender, "&7/nick color <code>");
@@ -100,7 +100,7 @@ public class NickCmd extends CommandBase {
 						Print.chat(sender, "&cNo Permission.");
 						return;
 					}
-					PlayerCapability ocap = getOtherPlayer(server, cap, args[1]);
+					PlayerCapability ocap = getOtherPlayer(MinecraftServer.getServer(), cap, args[1]);
 					if(ocap != null){
 						ocap.setRawNickname(null); ocap.setNicknameColor(2);
 						Print.chat(ocap, "&7Your Nickname was resetted by " + cap.getFormattedNickname());
@@ -136,7 +136,7 @@ public class NickCmd extends CommandBase {
 					Print.chat(sender, "&eNo Permission.");
 					return;
 				}
-				PlayerCapability ocap = getOtherPlayer(server, cap, args[1]);
+				PlayerCapability ocap = getOtherPlayer(MinecraftServer.getServer(), cap, args[1]);
 				if(ocap != null){
 					ocap.setNicknameColor(Integer.parseInt(args[2], StringUtils.indexOfAny(args[2], new String[]{"a", "b", "c", "d", "e", "f"}) >= 0 ? 16 : 10));
 					Print.chat(ocap, "&7Your Nickname color was changed by " + cap.getFormattedNickname());

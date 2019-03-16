@@ -13,17 +13,17 @@ import net.minecraft.server.MinecraftServer;
 public class GuiCmd extends CommandBase {
 
 	@Override
-	public String getName(){
+	public String getCommandName(){
 		return "st-gui";
 	}
 
 	@Override
-	public String getUsage(ICommandSender sender){
+	public String getCommandUsage(ICommandSender sender){
 		return "/st-gui <args>";
 	}
 
 	@Override
-	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
+	public void processCommand(ICommandSender sender, String[] args) {
 		if(sender instanceof EntityPlayer == false){
 			Print.chat(sender, "&7Only available Ingame.");
 			return;

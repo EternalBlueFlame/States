@@ -16,14 +16,12 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 
@@ -51,9 +49,9 @@ public class AreaView extends GuiContainer {
 		this.xSize = 244; this.ySize = 244;
 		//
 		Chunk chunk = world.getChunkFromBlockCoords(player.getPosition());
-		int[] i = ImageCache.getRegion(chunk.x, chunk.z);
+		int[] i = ImageCache.getRegion(chunk.xPosition, chunk.zPosition);
 		this.x = px = i[0]; this.z = pz = i[1];
-		this.pos = chunk.getPos();
+		this.pos = new ChunkPos(chunk.xPosition,0,chunk.zPosition);
 		terrain = false; mode = 0;
 		instance = this;
 		requestData();
@@ -69,7 +67,7 @@ public class AreaView extends GuiContainer {
 		this.mc.getTextureManager().bindTexture(terrain ? map_texture : empty_tex);
 		int x = this.guiLeft + 10;
 		int y = this.guiTop + 10;
-        Tessellator tessellator = Tessellator.getInstance();
+        Tessellator tessellator = Tessellator.instance;
         BufferBuilder bufferbuilder = tessellator.getBuffer();
         bufferbuilder.begin(7, DefaultVertexFormats.POSITION_TEX);
         bufferbuilder.pos((double)(x +   0), (double)(y + 224), (double)this.zLevel).tex((double)((float)(0 +   0) * 0.00390625F), (double)((float)(0 + 256) * 0.00390625F)).endVertex();
@@ -98,13 +96,13 @@ public class AreaView extends GuiContainer {
 				if(!this.visible){ return; }
 				GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 				mc.getTextureManager().bindTexture(texture);
-				this.hovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
+				this.hovered = mouseX >= this.xPosition && mouseY >= this.yPosition && mouseX < this.xPosition + this.width && mouseY < this.yPosition + this.height;
 				if(this.hovered){ HOVERCLR.glColorApply(); }
 				else{ if(terrain){ ONCLR.glColorApply(); } else { OFFCLR.glColorApply(); }}
 				this.drawTexturedModalRect(this.x, this.y, 238, 69, this.width, this.height);
 				RGB.glColorReset();
 				if(hovered){
-					instance.drawHoveringText((!instance.terrain ? "Enable" : "Disable") + " Terrain", mouseX, mouseY);
+					instance.drawHoveringText((!instance.terrain ? "Enable" : "Disable") + " Terrain", mouseX, mouseY,fontRendererObj);
 				}
 			}
 		});
@@ -218,8 +216,8 @@ public class AreaView extends GuiContainer {
             GlStateManager.enableBlend();
             GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
             GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-            this.hovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
-            xx = mouseX - x; yy = mouseY - this.y;
+            this.hovered = mouseX >= this.xPosition && mouseY >= this.yPosition && mouseX < this.xPosition + this.width && mouseY < this.yPosition + this.height;
+            xx = mouseX - xPosition; yy = mouseY - this.yPosition;
             if(xx >= 224){ xx = -1; } if(yy >= 224){ yy = -1; }
             if(instance.list == null){ return; }
             instance.m = -1;

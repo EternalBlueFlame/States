@@ -36,17 +36,17 @@ import net.minecraft.util.math.BlockPos;
 public class ChunkCmd extends CommandBase {
 
 	@Override
-	public String getName(){
+	public String getCommandName(){
 		return "ck";
 	}
 
 	@Override
-	public String getUsage(ICommandSender sender){
+	public String getCommandUsage(ICommandSender sender){
 		return "/ck";
 	}
 	
 	@Override
-    public boolean checkPermission(MinecraftServer server, ICommandSender sender){
+    public boolean canCommandSenderUseCommand(ICommandSender sender){
         return sender != null;
     }
 	
@@ -60,7 +60,7 @@ public class ChunkCmd extends CommandBase {
 	}
 
 	@Override
-	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
+	public void processCommand(ICommandSender sender, String[] args){
 		if(args.length == 0){
 			Print.chat(sender, "&7/ck claim <args>");
 			Print.chat(sender, "&7/ck reclaim <args>");
@@ -79,11 +79,11 @@ public class ChunkCmd extends CommandBase {
 			Print.chat(sender, "&7/ck force-load <true/false>");
 			return;
 		}
-		if(sender.getCommandSenderEntity() instanceof EntityPlayer == false){
+		if(sender instanceof EntityPlayer == false){
 			Print.chat(sender, "&7Only available Ingame.");
 			return;
 		}
-		EntityPlayer player = (EntityPlayer)sender.getCommandSenderEntity();
+		EntityPlayer player = (EntityPlayer)sender;
 		PlayerCapability playerdata = player.getCapability(StatesCapabilities.PLAYER, null);
 		Chunk chunk = StateUtil.getChunk(player);
 		switch(args[0]){

@@ -21,17 +21,17 @@ import net.minecraft.server.MinecraftServer;
 public class AdminCmd extends CommandBase {
 
     @Override
-    public String getName(){
+    public String getCommandName(){
         return "st-admin";
     }
 
     @Override
-    public String getUsage(ICommandSender sender){
+    public String getCommandUsage(ICommandSender sender){
 	return "/st-admin <args>";
     }
     
     @Override
-    public boolean checkPermission(MinecraftServer server, ICommandSender sender){
+    public boolean canCommandSenderUseCommand(ICommandSender sender){
         return sender != null;
     }
 	
@@ -41,7 +41,7 @@ public class AdminCmd extends CommandBase {
     }
 
 	@Override
-	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
+	public void processCommand(ICommandSender sender, String[] args) {
 		if(args.length == 0){
 			Print.chat(sender, "&7/st-admin forceclaim <dis-id>");
 			Print.chat(sender, "&7/st-admin ...");

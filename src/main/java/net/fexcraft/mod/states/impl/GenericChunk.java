@@ -44,7 +44,7 @@ public class GenericChunk implements Chunk {
 	private long lasttaxcheck, ctax;
 	
 	public GenericChunk(World world, ChunkPos pos, boolean create){
-		this.x = pos.x; this.z = pos.z; this.pos = pos;
+		this.x = pos.posX; this.z = pos.posZ; this.pos = pos;
 		JsonElement jsn = StateUtil.read(getChunkFile());
 		JsonObject obj = jsn == null ? new JsonObject() : jsn.getAsJsonObject();
 		parseJson(obj);
