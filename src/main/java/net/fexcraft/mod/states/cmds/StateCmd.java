@@ -539,8 +539,8 @@ public class StateCmd extends CommandBase {
 				}
 				catch(Exception e){
 					Print.chat(sender, "Error: " + e.getMessage());
-					Print.chat(sender, e);
-					Print.debug(e);
+					Print.chat(sender, e.getMessage());
+					Print.debug(e.getMessage());
 				}
 				return;
 			}

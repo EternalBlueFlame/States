@@ -132,7 +132,7 @@ public class ClaimMap extends GuiContainer {
 		public void drawButton(Minecraft mc, int mouseX, int mouseY){
 			if(!visible){ return; }
 			//mc.getTextureManager().bindTexture(texture);
-            this.hovered = mouseX >= this.xPosition && mouseY >= this.yPosition && mouseX < this.xPosition + this.width && mouseY < this.yPosition + this.height;
+            this.field_146123_n = mouseX >= this.xPosition && mouseY >= this.yPosition && mouseX < this.xPosition + this.width && mouseY < this.yPosition + this.height;
             xx = mouseX - xPosition; yy = mouseY - this.yPosition;
             if(xx >= 110){ xx = -1; } if(yy >= 110){ yy = -1; }
             if(list == null){ return; }

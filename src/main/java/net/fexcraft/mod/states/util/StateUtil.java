@@ -17,6 +17,7 @@ import com.mojang.authlib.GameProfile;
 
 import com.sun.javafx.geom.Vec3d;
 import cpw.mods.fml.common.FMLCommonHandler;
+import net.fexcraft.lib.mc.utils.Static;
 import net.fexcraft.mod.fsmm.util.Print;
 import net.fexcraft.mod.lib.fcl.Formatter;
 import net.fexcraft.mod.lib.fcl.JsonUtil;
@@ -41,21 +42,22 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Vec3;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.server.permission.PermissionAPI;
 
 public class StateUtil extends TimerTask {
     
     public static @Nullable Chunk getChunk(int x, int z){
-        return States.CHUNKS.get(new ChunkPos(x, z));
+        return States.CHUNKS.get(new ChunkPos(x,0, z));
     }
     
     public static @Nullable Chunk getChunk(EntityPlayer player){
-        return getChunk(player.getPosition());
+        return getChunk(new BlockPos(player));
     }
     
     public static @Nullable Chunk getChunk(BlockPos pos){
-        return getChunk(pos.x() >> 4, pos.getZ() >> 4);
+        return getChunk(pos.getX() >> 4, pos.getZ() >> 4);
     }
 
 	public static @Nullable Chunk getChunk(TileEntity pos){
@@ -75,7 +77,7 @@ public class StateUtil extends TimerTask {
     
     public static Chunk getTempChunk(int x, int z){
         Chunk chunk = getChunk(x, z);
-        return chunk == null ? new GenericChunk(null, new ChunkPos(x, z), false) : chunk;
+        return chunk == null ? new GenericChunk(null, new ChunkPos(x,0, z), false) : chunk;
     }
     
     public static Chunk getTempChunk(ChunkPos pos){
@@ -190,7 +192,7 @@ public class StateUtil extends TimerTask {
 				//TODO doesn't exists yet.
 				break;
 			case STATE:
-				server.getPlayerList().getPlayers().forEach(player -> {
+				Static.getPlayers().forEach(player -> {
 					PlayerCapability playerdata;
 					if((playerdata = player.getCapability(StatesCapabilities.PLAYER, null)) != null && playerdata.getMunicipality().getState().getId() == range){
 						Print.chat(player, string);
@@ -198,14 +200,14 @@ public class StateUtil extends TimerTask {
 				});
 				break;
 			case STATE_ALL:
-				server.getPlayerList().getPlayers().forEach(player -> {
+				Static.getPlayers().forEach(player -> {
 					if(StateUtil.getChunk(player).getDistrict().getMunicipality().getState().getId() == range){
 						Print.chat(player, string);
 					}
 				});
 				break;
 			case MUNICIPALITY:
-				server.getPlayerList().getPlayers().forEach(player -> {
+				Static.getPlayers().forEach(player -> {
 					PlayerCapability playerdata;
 					if((playerdata = player.getCapability(StatesCapabilities.PLAYER, null)) != null && playerdata.getMunicipality().getId() == range){
 						Print.chat(player, string);
@@ -213,14 +215,14 @@ public class StateUtil extends TimerTask {
 				});
 				break;
 			case MUNICIPALITY_ALL:
-				server.getPlayerList().getPlayers().forEach(player -> {
+				Static.getPlayers().forEach(player -> {
 					if(StateUtil.getChunk(player).getDistrict().getMunicipality().getId() == range){
 						Print.chat(player, string);
 					}
 				});
 				break;
 			case DISTRICT:
-				server.getPlayerList().getPlayers().forEach(player -> {
+				Static.getPlayers().forEach(player -> {
 					if(StateUtil.getChunk(player).getDistrict().getId() == range){
 						Print.chat(player, string);
 					}
@@ -238,12 +240,12 @@ public class StateUtil extends TimerTask {
 	private static List<EntityPlayerMP> getPlayersInRange(MinecraftServer server, ICommandSender sender, int range){
 		if(sender == null || server == null){ return new ArrayList<EntityPlayerMP>(); }
 		List<EntityPlayerMP> list = new ArrayList<EntityPlayerMP>();
-		Vec3d position = sender.getCommandSenderEntity().getPositionVector();
-        for(EntityPlayerMP player : FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayers()){
-            if(player.dimension == sender.getCommandSenderEntity().dimension){
-                double d4 = position.x - player.posX;
-                double d5 = position.y - player.posY;
-                double d6 = position.z - player.posZ;
+		Vec3 position = ((EntityPlayer)sender).getPosition(1.0F);
+        for(EntityPlayerMP player : Static.getPlayers()){
+            if(player.dimension == ((EntityPlayer)sender).dimension){
+                double d4 = position.xCoord - player.posX;
+                double d5 = position.yCoord - player.posY;
+                double d6 = position.zCoord - player.posZ;
                 if(d4 * d4 + d5 * d5 + d6 * d6 < range * range){
                     list.add(player);
                 }

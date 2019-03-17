@@ -49,11 +49,11 @@ public class NickCmd extends CommandBase {
 			Print.chat(sender, "&7/nick reset <player>");
 			return;
 		}
-		if(sender.getCommandSenderEntity() instanceof EntityPlayer == false){
+		if(sender instanceof EntityPlayer == false){
 			Print.chat(sender, "&7Only available Ingame.");
 			return;
 		}
-		EntityPlayer player = (EntityPlayer)sender.getCommandSenderEntity();
+		EntityPlayer player = (EntityPlayer)sender;
 		PlayerCapability cap = player.getCapability(StatesCapabilities.PLAYER, null);
 		if(args.length < 2 && !args[0].equals("reset")){
 			Print.chat(sender, "Missing Arguments.");

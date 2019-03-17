@@ -79,7 +79,7 @@ public class PlayerEvents {
 	@SubscribeEvent
 	public static void onRespawn(PlayerEvent.Clone event){
 		event.entityPlayer.getCapability(StatesCapabilities.PLAYER, null)
-			.copyFromOld(event.getOriginal().getCapability(StatesCapabilities.PLAYER, null));
+			.copyFromOld(event.original.getCapability(StatesCapabilities.PLAYER, null));
 		States.PLAYERS.put(event.entityPlayer.getGameProfile().getId(),
 			event.entityPlayer.getCapability(StatesCapabilities.PLAYER, null));
 		MessageSender.toWebhook(null, event.entityPlayer.getGameProfile().getName() + " respawned.");

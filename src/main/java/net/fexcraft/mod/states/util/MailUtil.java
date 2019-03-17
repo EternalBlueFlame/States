@@ -113,7 +113,7 @@ public class MailUtil {
 				ForgeChunkManager.unforceChunk(ticket, pos.getChunkCoords());
 			}
 			if(rectype == RecipientType.PLAYER){
-				EntityPlayer player = Static.getServer().getPlayerList().getPlayerByUUID(UUID.fromString(receiver.toString()));
+				EntityPlayer player = Static.getPlayerByUUID(UUID.fromString(receiver.toString()));
 				if(player != null) Print.chat(player, "&6&oYou have got new mail!");
 			}
 		}

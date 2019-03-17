@@ -10,6 +10,7 @@ import net.fexcraft.mod.states.api.State;
 import net.fexcraft.mod.states.api.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.api.capabilities.StatesCapabilities;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.server.MinecraftServer;
 
 public class StatesPermissions {
 	
@@ -82,7 +83,7 @@ public class StatesPermissions {
 	}
 
 	private static boolean isOperator(EntityPlayer entity){
-		return Static.getServer().getPlayerList().getOppedPlayers().getPermissionLevel(entity.getGameProfile()) > 0;
+		return MinecraftServer.getServer().getConfigurationManager().func_152596_g(entity.getGameProfile());
 	}
 
 	public static class Permission {

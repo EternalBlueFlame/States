@@ -3,7 +3,6 @@ package net.fexcraft.mod.states.cmds;
 import java.util.UUID;
 
 import net.fexcraft.mod.states.util.*;
-import org.apache.commons.lang3.math.NumberUtils;
 
 import com.mojang.authlib.GameProfile;
 
@@ -706,7 +705,7 @@ public class ChunkCmd extends CommandBase {
 	private boolean isOwner(Chunk chunk, EntityPlayer player){
 		if(chunk.getLink() != null){
 			ChunkPos link = chunk.getLink();
-			Print.chat(player, "&7Chunk is linked to a chunk at &2" + link.x + "x&7, &2" + link.z + "z&7.");
+			Print.chat(player, "&7Chunk is linked to a chunk at &2" + link.posX + "x&7, &2" + link.posZ + "z&7.");
 			Print.chat(player, "&7Please make changes to that chunk, they will be copied to this one.");
 			Print.chat(player, "&7Alternatively unlink this chunk.");
 			return false;

@@ -94,7 +94,7 @@ public class AreaView extends GuiContainer {
 		this.buttonList.add(new AGB(2, guiLeft, 238, guiTop, 53, "East >>"));
 		this.buttonList.add(new GuiButton(3, guiLeft + 238, guiTop + 69, 14, 14, ""){			
 			@Override
-			public void drawButton(Minecraft mc, int mouseX, int mouseY, float f){
+			public void drawButton(Minecraft mc, int mouseX, int mouseY){
 				if(!this.visible){ return; }
 				GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 				mc.getTextureManager().bindTexture(texture);
@@ -104,7 +104,7 @@ public class AreaView extends GuiContainer {
 				this.drawTexturedModalRect(this.x, this.y, 238, 69, this.width, this.height);
 				RGB.glColorReset();
 				if(field_146123_n){
-					instance.drawHoveringText((!instance.terrain ? "Enable" : "Disable") + " Terrain", mouseX, mouseY,fontRendererObj);
+					instance.drawHoveringText(Collections.singletonList((!instance.terrain ? "Enable" : "Disable") + " Terrain"), mouseX, mouseY,fontRendererObj);
 				}
 			}
 		});
@@ -183,7 +183,7 @@ public class AreaView extends GuiContainer {
 		}
 		
 		@Override
-		public void drawButton(Minecraft mc, int mouseX, int mouseY, float f){
+		public void drawButton(Minecraft mc, int mouseX, int mouseY){
 			if(!this.visible){ return; }
 			mc.getTextureManager().bindTexture(texture);
 			this.field_146123_n = mouseX >= this.xPosition && mouseY >= this.yPosition && mouseX < this.xPosition + this.width && mouseY < this.yPosition + this.height;

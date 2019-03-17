@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.util.Collection;
 
 import net.fexcraft.mod.states.util.NumberUtil;
-import org.apache.commons.lang3.math.NumberUtils;
 
 import com.mojang.authlib.GameProfile;
 

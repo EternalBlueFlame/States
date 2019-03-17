@@ -16,8 +16,8 @@ import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntitySign;
-import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.capabilities.Capability;
 
 public class SignTileEntityImplementation implements SignTileEntityCapability {
@@ -135,8 +135,8 @@ public class SignTileEntityImplementation implements SignTileEntityCapability {
 		lastupdate = chunk.getChanged();
 		//
 		if(send){
-			Static.getServer().getPlayerList().getPlayers().forEach(player -> {
-				player.connection.sendPacket(tileentity.getDescriptionPacket());
+			Static.getPlayers().forEach(player -> {
+				player.playerNetServerHandler.sendPacket(tileentity.getDescriptionPacket());
 			});
 		}
 	}
@@ -175,10 +175,10 @@ public class SignTileEntityImplementation implements SignTileEntityCapability {
 			update(chunk, null, true);
 			return;
 		}
-		Print.debug(player, chunk.toJsonObject());
+		Print.debug(player.getDisplayName(), chunk.toJsonObject().getAsString());
 		switch(mode){
 			case "chunk":{
-				MinecraftServer.getServer().getCommandManager().executeCommand(player, chunk.getPrice() > 0 ? ("ck buy via-sign " + tileentity.getPos().toLong()) : "ck info");
+				MinecraftServer.getServer().getCommandManager().executeCommand(player, chunk.getPrice() > 0 ? ("ck buy via-sign " + new BlockPos(tileentity).toLong()) : "ck info");
 				break;
 			}
 			case "district":{

@@ -56,7 +56,7 @@ public class TaxSystem extends TimerTask {
 				TaxSystem.processChunkTax(date, chunk);
 			}
 			StateLogger.log(StateLogger.LoggerType.PLAYER, "Collecting tax from online players...");
-			ImmutableList<EntityPlayerMP> players = ImmutableList.copyOf(Static.getServer().getPlayerList().getPlayers());
+			ImmutableList<EntityPlayerMP> players = ImmutableList.copyOf(Static.getPlayers());
 			for(EntityPlayerMP player : players){
 				TaxSystem.processPlayerTax(date, player.getCapability(StatesCapabilities.PLAYER, null));
 			}
@@ -122,7 +122,7 @@ public class TaxSystem extends TimerTask {
 	}
 
 	private static boolean isOnline(UUID uuid){
-		for(EntityPlayerMP player : Static.getServer().getPlayerList().getPlayers()){
+		for(EntityPlayerMP player : Static.getPlayers()){
 			if(player.getGameProfile().getId().equals(uuid)){
 				return true;
 			}

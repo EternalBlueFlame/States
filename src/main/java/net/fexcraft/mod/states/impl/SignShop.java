@@ -266,7 +266,7 @@ public class SignShop implements SignCapability.Listener {
 		}
 		NBTTagCompound compound = (NBTTagCompound)nbt;
 		try{
-			itemtype = new ItemStack(compound);
+			itemtype = ItemStack.loadItemStackFromNBT(compound);
 			price = compound.getInteger("sign:price");
 			active = compound.getBoolean("sign:active");
 			account = new ResourceLocation(compound.getString("sign:account"));
