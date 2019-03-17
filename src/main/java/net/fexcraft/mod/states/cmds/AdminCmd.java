@@ -1,5 +1,6 @@
 package net.fexcraft.mod.states.cmds;
 
+import net.fexcraft.mod.states.util.NumberUtil;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import net.fexcraft.mod.states.guis.Listener;
@@ -12,10 +13,8 @@ import net.fexcraft.mod.fsmm.util.Print;
 import net.fexcraft.mod.states.api.Chunk;
 import net.fexcraft.mod.states.api.District;
 import net.minecraft.command.CommandBase;
-import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.server.MinecraftServer;
 
 @fCommand
 public class AdminCmd extends CommandBase {
@@ -59,7 +58,7 @@ public class AdminCmd extends CommandBase {
 		}
 		switch(args[0]){
 			case "forceclaim":{
-				if(args.length == 1 || !NumberUtils.isCreatable(args[1])){
+				if(args.length == 1 || !NumberUtil.isCreatable(args[1])){
 					Print.chat(player, "&7Please enter the numerical district ID as second argument!");
 				}
 				else{

@@ -53,12 +53,12 @@ public class GenericChunk implements Chunk {
 			save();
 			//ImageCache.update(world, world.getChunkFromChunkCoords(x, z));
 			//World world = Static.getServer().getWorld(0);
-			ImageCache.update(world, world.getChunkProvider().getLoadedChunk(x, z));
+			ImageCache.update(world, world.getChunkProvider().loadChunk(x, z));
 		}
 		if(Time.getDate() - JsonUtil.getIfExists(obj, "last_save", 0).longValue() > Time.DAY_MS){
 			//ImageCache.update(world, world.getChunkFromChunkCoords(x, z));
 			//World world = Static.getServer().getWorld(0);
-			ImageCache.update(world, world.getChunkProvider().getLoadedChunk(x, z));
+			ImageCache.update(world, world.getChunkProvider().loadChunk(x, z));
 		}
 		if(district != null && this.district.getId() == -2 && this.getChanged() + Time.DAY_MS < Time.getDate()){
 			StateLogger.log(StateLogger.LoggerType.CHUNK, StateLogger.district(-2) + " time of " + StateLogger.chunk(this) + " expired! Setting back to " + StateLogger.district(-1) + "!");
@@ -155,17 +155,17 @@ public class GenericChunk implements Chunk {
 		obj.addProperty("type", type.toString());
 		obj.addProperty("owner", owner == null ? "null" : owner);
 		if(link != null){
-			obj.addProperty("link", link.x + ":" + link.z);
+			obj.addProperty("link", link.posX + ":" + link.posZ);
 		}
 		if(!linked.isEmpty()){
 			JsonArray array = new JsonArray();
-			linked.forEach(rs -> array.add(rs.toString()));
+			linked.forEach(rs -> array.add(JsonUtil.getFromString(rs.toString())));
 			obj.add("linked", array);
 		}
 		if(wl_players.size() > 0 || wl_companies.size() > 0){
 			JsonArray array = new JsonArray();
-			wl_players.forEach(entry -> array.add(entry.toString()));
-			wl_companies.forEach(entry -> array.add(entry));
+			wl_players.forEach(entry -> array.add(JsonUtil.getFromString(entry.toString())));
+			wl_companies.forEach(entry -> array.add(JsonUtil.getFromString(entry+"")));
 			obj.add("whitelist", array);
 		}
 		obj.addProperty("last_tax_collection", lastTaxCollection());

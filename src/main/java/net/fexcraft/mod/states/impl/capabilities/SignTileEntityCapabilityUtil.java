@@ -23,7 +23,7 @@ public class SignTileEntityCapabilityUtil implements ICapabilitySerializable<NBT
 		tileentity = (TileEntitySign)object;
 		instance = StatesCapabilities.SIGN_TE.getDefaultInstance();
 		instance.setTileEntity(tileentity);
-		TILEENTITIES.put(tileentity.getPos(), tileentity);
+		TILEENTITIES.put(new BlockPos(tileentity), tileentity);
 	}
 
 	@Override

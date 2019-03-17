@@ -9,13 +9,13 @@ import java.util.Map.Entry;
 import javax.annotation.Nullable;
 
 import net.fexcraft.mod.lib.fcl.JsonUtil;
-import org.apache.commons.lang3.math.NumberUtils;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.ChunkCoordIntPair;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import net.fexcraft.lib.mc.utils.Static;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.ChunkPos;
 import net.minecraft.world.World;
@@ -34,12 +34,12 @@ public class ForcedChunksManager implements LoadingCallback {
 		States.LOADED_CHUNKS.entrySet().forEach(entry -> {
 			entry.getValue().forEach(pos -> {
 				if(getTicketForChunk(pos) == null){
-					ForgeChunkManager.forceChunk(getFreeTicket(), pos);
+					ForgeChunkManager.forceChunk(getFreeTicket(), pos.getChunkCoords());
 				}
 			});
 		});
 		for(Ticket ticket : tickets){
-			for(net.minecraft.util.math.ChunkPos pos : ticket.getChunkList()){
+			for(ChunkCoordIntPair pos : ticket.getChunkList()){
 				boolean found = false;
 				for(Collection<ChunkPos> cks : States.LOADED_CHUNKS.values()){
 					for(ChunkPos ckp : cks){ if(ckp.equals(pos)){ found = true; break; } }
@@ -69,14 +69,14 @@ public class ForcedChunksManager implements LoadingCallback {
 		else{
 			States.LOADED_CHUNKS.clear();
 			obj.entrySet().forEach(entry -> {
-				if(entry.getValue().isJsonArray() && NumberUtils.isCreatable(entry.getKey())){
+				if(entry.getValue().isJsonArray() && NumberUtil.isCreatable(entry.getKey())){
 					int i = Integer.parseInt(entry.getKey());
 					ArrayList<ChunkPos> list = new ArrayList<>();
 					for(JsonElement elm : entry.getValue().getAsJsonArray()){
 						try{
 							int x = elm.getAsJsonObject().get("x").getAsInt();
 							int z = elm.getAsJsonObject().get("z").getAsInt();
-							list.add(new ChunkPos(x, z));
+							list.add(new ChunkPos(x,0, z));
 						}
 						catch(Exception e){ e.printStackTrace(); }
 					}
@@ -93,7 +93,7 @@ public class ForcedChunksManager implements LoadingCallback {
 		for(Entry<Integer, List<ChunkPos>> entry : States.LOADED_CHUNKS.entrySet()){
 			JsonArray array = new JsonArray();
 			for(ChunkPos pos : entry.getValue()){
-				JsonObject jsn = new JsonObject(); jsn.addProperty("x", pos.x); jsn.addProperty("z", pos.z); array.add(jsn);
+				JsonObject jsn = new JsonObject(); jsn.addProperty("x", pos.posX); jsn.addProperty("z", pos.posZ); array.add(jsn);
 			}
 			obj.add(entry.getKey() + "", array);
 		}
@@ -106,13 +106,13 @@ public class ForcedChunksManager implements LoadingCallback {
 	}
 	
 	private static @Nullable Ticket requestTicket(){
-		Ticket ticket = ForgeChunkManager.requestTicket(States.INSTANCE, Static.getServer().worlds[0], ForgeChunkManager.Type.NORMAL);
+		Ticket ticket = ForgeChunkManager.requestTicket(States.INSTANCE, MinecraftServer.getServer().worldServers[0], ForgeChunkManager.Type.NORMAL);
 		if(ticket != null){ tickets.add(ticket); } return ticket;
 	}
 	
 	public static @Nullable Ticket getTicketForChunk(ChunkPos pos){
 		for(Ticket ticket : tickets){
-			for(net.minecraft.util.math.ChunkPos ckp : ticket.getChunkList()){
+			for(ChunkCoordIntPair ckp : ticket.getChunkList()){
 				if(pos.equals(ckp)){ return ticket; }
 			}
 		}
@@ -152,7 +152,7 @@ public class ForcedChunksManager implements LoadingCallback {
 	/** Warning! Does not remove from the "States" loaded-chunk list as of now!*/
 	public static void requestUnload(ChunkPos pos){
 		Ticket ticket = getTicketForChunk(pos);
-		if(ticket != null){ ForgeChunkManager.unforceChunk(ticket, pos); }
+		if(ticket != null){ ForgeChunkManager.unforceChunk(ticket, pos.getChunkCoords()); }
 		return;
 	}
 	

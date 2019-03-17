@@ -16,11 +16,11 @@ import com.google.gson.JsonObject;
 
 import net.fexcraft.lib.common.math.Time;
 import net.fexcraft.mod.fsmm.util.Print;
-import net.fexcraft.lib.mc.utils.Static;
 import net.fexcraft.mod.lib.fcl.JsonUtil;
 import net.fexcraft.mod.states.States;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
@@ -67,19 +67,19 @@ public class ImageCache extends TimerTask {
 	}
 	
 	private static final void updateImage(World world, Chunk chunk){
-		BufferedImage img = getImage(chunk.x, chunk.z, false);
+		BufferedImage img = getImage(chunk.xPosition, chunk.zPosition, false);
 		if(img == null){ return; }
-		int rx = (int)Math.floor(chunk.x / 32.0), rz = (int)Math.floor(chunk.z / 32.0);
-		int x = (chunk.x * 16) - (rx * 512), z = (chunk.z * 16) - (rz * 512);
+		int rx = (int)Math.floor(chunk.xPosition / 32.0), rz = (int)Math.floor(chunk.zPosition / 32.0);
+		int x = (chunk.xPosition * 16) - (rx * 512), z = (chunk.zPosition * 16) - (rz * 512);
 		for(int i = 0; i < 16; i++){
 			for(int j = 0; j < 16; j++){
-				BlockPos pos = getPos(world, i + (chunk.x * 16), j + (chunk.z * 16));
-				IBlockState state = world.getBlockState(pos);
-				img.setRGB(x + i, z + j, new Color(state.getMapColor(world, pos).colorValue).getRGB());
+				BlockPos pos = getPos(world, i + (chunk.xPosition * 16), j + (chunk.zPosition * 16));
+				Block state = world.getBlock(pos.getX(),pos.getY(),pos.getZ());
+				img.setRGB(x + i, z + j, new Color(state.getMapColor(0).colorValue).getRGB());
 			}
 		}
 		//Save
-		String regaddr = getChunkRegion(chunk.x, chunk.z);
+		String regaddr = getChunkRegion(chunk.xPosition, chunk.zPosition);
 		if(LOADED_CACHE.containsKey(regaddr)){
 			TempImg temp = LOADED_CACHE.get(regaddr);
 			temp.image = img;
@@ -142,7 +142,7 @@ public class ImageCache extends TimerTask {
 	private static final BlockPos getPos(World world, int x, int z){
 		for(int i = 255; i > 0; i--){
 			BlockPos pos = new BlockPos(x, i, z);
-			if(world.getBlockState(pos).getBlock() != Blocks.AIR){
+			if(world.getBlock(pos.getX(),pos.getY(),pos.getZ()) != Blocks.air){
 				return pos;
 			}
 		}
@@ -154,8 +154,8 @@ public class ImageCache extends TimerTask {
 		QueueObj entry = null;
 		while((entry = QUEUE.poll()) != null){
 			JsonObject obj = new JsonObject();
-			obj.addProperty("dimension", entry.world.provider.getDimension());
-			obj.addProperty("chunk", entry.chunk.x + ":" + entry.chunk.z);
+			obj.addProperty("dimension", entry.world.provider.dimensionId);
+			obj.addProperty("chunk", entry.chunk.xPosition + ":" + entry.chunk.zPosition);
 			array.add(obj);
 		}
 		JsonObject obj = new JsonObject();
@@ -177,7 +177,7 @@ public class ImageCache extends TimerTask {
 			JsonArray array = obj.get("queue").getAsJsonArray();
 			array.forEach(elm -> {
 				JsonObject object = elm.getAsJsonObject();
-				World world = Static.getServer().getWorld(object.get("dimension").getAsInt());
+				World world = MinecraftServer.getServer().worldServers[object.get("dimension").getAsInt()];
 				String[] ckarr = object.get("chunk").getAsString().split(":");
 				Chunk chunk = world.getChunkFromChunkCoords(Integer.parseInt(ckarr[0]), Integer.parseInt(ckarr[1]));
 				QUEUE.add(new QueueObj(world, chunk));

@@ -3,6 +3,7 @@ package net.fexcraft.mod.states.cmds;
 import java.awt.Color;
 import java.util.Collection;
 
+import net.fexcraft.mod.states.util.NumberUtil;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import com.mojang.authlib.GameProfile;
@@ -195,7 +196,7 @@ public class MunicipalityCmd extends CommandBase {
 								Print.chat(sender, "&9Missing Argument!");
 								break;
 							}
-							GameProfile gp = Static.getServer().getPlayerProfileCache().getGameProfileForUsername(args[2]);
+							GameProfile gp = MinecraftServer.getServer().func_152358_ax().func_152655_a(args[2]);
 							if(gp == null || gp.getId() == null){
 								Print.chat(sender, "&cPlayer not found in Cache.");
 								break;
@@ -337,7 +338,7 @@ public class MunicipalityCmd extends CommandBase {
 								mun.setCitizenTax(0); mun.save();
 								Print.chat(sender, "&9Municipality's Citizen Tax was reset!");
 							}
-							else if(NumberUtils.isCreatable(args[2])){
+							else if(NumberUtil.isCreatable(args[2])){
 								mun.setCitizenTax(Long.parseLong(args[2])); mun.save();
 								Print.chat(sender, "&9Municipality's Citizen Tax was set! (" + ggas(mun.getCitizenTax()) + ")");
 							}
@@ -390,7 +391,7 @@ public class MunicipalityCmd extends CommandBase {
 							Print.chat(sender, "&9Missing Argument.");
 							return;
 						}
-						GameProfile gp = Static.getServer().getPlayerProfileCache().getGameProfileForUsername(args[2]);
+						GameProfile gp = MinecraftServer.getServer().func_152358_ax().func_152655_a(args[2]);
 						if(gp == null){
 							Print.chat(sender, "&eGameProfile not found.");
 							return;
@@ -424,7 +425,7 @@ public class MunicipalityCmd extends CommandBase {
 							Print.chat(sender, "&7/mun council invite <playername> <optional:message>");
 							return;
 						}
-						GameProfile gp = server.getPlayerProfileCache().getGameProfileForUsername(args[2]);
+						GameProfile gp = MinecraftServer.getServer().func_152358_ax().func_152655_a(args[2]);
 						if(gp == null || gp.getId() == null){
 							Print.chat(sender, "&cPlayer not found.");
 							return;
@@ -483,7 +484,7 @@ public class MunicipalityCmd extends CommandBase {
 						Print.chat(sender, "&cMissing Argument.");
 						return;
 					}
-					GameProfile gp = Static.getServer().getPlayerProfileCache().getGameProfileForUsername(args[2]);
+					GameProfile gp = MinecraftServer.getServer().func_152358_ax().func_152655_a(args[2]);
 					if(gp == null || gp.getId() == null){
 						Print.chat(sender, "&aPlayer not found.");
 						return;
@@ -528,7 +529,7 @@ public class MunicipalityCmd extends CommandBase {
 					Print.chat(sender, "&7/mun kick <playername> <optional:reason>");
 					return;
 				}
-				GameProfile gp = server.getPlayerProfileCache().getGameProfileForUsername(args[1]);
+				GameProfile gp = MinecraftServer.getServer().func_152358_ax().func_152655_a(args[1]);
 				if(gp == null || gp.getId() == null){
 					Print.chat(sender, "&cPlayer not found.");
 					return;
@@ -594,8 +595,8 @@ public class MunicipalityCmd extends CommandBase {
 				if(!ply.canLeave(sender)){
 					return;
 				}
-				MailUtil.send(sender, RecipientType.MUNICIPALITY, ply.getMunicipality().getId(), sender.getName(), player.getGameProfile().getName() + " left the Municipality. At " + Time.getAsString(-1), MailType.SYSTEM);
-				StateUtil.announce(server, AnnounceLevel.MUNICIPALITY, "&o" + ply.getFormattedNickname() + " &e&oleft the Municipality!", ply.getMunicipality().getId());
+				MailUtil.send(sender, RecipientType.MUNICIPALITY, ply.getMunicipality().getId(), sender.getCommandSenderName(), player.getGameProfile().getName() + " left the Municipality. At " + Time.getAsString(-1), MailType.SYSTEM);
+				StateUtil.announce(MinecraftServer.getServer(), AnnounceLevel.MUNICIPALITY, "&o" + ply.getFormattedNickname() + " &e&oleft the Municipality!", ply.getMunicipality().getId());
 				StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, StateLogger.player(player) + " left " + StateLogger.municipality(mun) + ".");
 				ply.setMunicipality(StateUtil.getMunicipality(-1));
 				return;
@@ -609,7 +610,7 @@ public class MunicipalityCmd extends CommandBase {
 					Print.chat(sender, "&7/mun invite <playername> <optional:message>");
 					return;
 				}
-				GameProfile gp = server.getPlayerProfileCache().getGameProfileForUsername(args[1]);
+				GameProfile gp = MinecraftServer.getServer().func_152358_ax().func_152655_a(args[1]);
 				if(gp == null || gp.getId() == null){
 					Print.chat(sender, "&cPlayer not found.");
 					return;

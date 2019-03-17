@@ -14,9 +14,10 @@ import net.fexcraft.mod.states.guis.Listener;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntitySign;
+import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.common.capabilities.Capability;
 
 public class SignTileEntityImplementation implements SignTileEntityCapability {
@@ -29,7 +30,7 @@ public class SignTileEntityImplementation implements SignTileEntityCapability {
 	@Override
 	public void setup(Chunk chunk){
 		isStatesSign = true;
-		mode = tileentity.signText[1].getUnformattedText().toLowerCase();
+		mode = tileentity.signText[1].toLowerCase();
 		update(chunk, null, true);
 	}
 
@@ -52,64 +53,64 @@ public class SignTileEntityImplementation implements SignTileEntityCapability {
 		switch(mode){
 			case "chunk":{
 				if(chunk.getPrice() > 0){
-					tileentity.signText[1] = new TextComponentString(Formatter.format("&2For Sale!"));
-					tileentity.signText[2] = new TextComponentString(Config.getWorthAsString(chunk.getPrice()));
-					//tileentity.signText[3] = new TextComponentString(Formatter.format("&2" + (chunk.getType() == ChunkType.PRIVATE ? Static.getPlayerNameByUUID(UUID.fromString(chunk.getOwner())) : chunk.getOwner())));
+					tileentity.signText[1] = Formatter.format("&2For Sale!");
+					tileentity.signText[2] = Config.getWorthAsString(chunk.getPrice());
+					//tileentity.signText[3] = Formatter.format("&2" + (chunk.getType() == ChunkType.PRIVATE ? Static.getPlayerNameByUUID(UUID.fromString(chunk.getOwner())) : chunk.getOwner()));
 				}
 				else{
 					switch(chunk.getType()){
 						case PRIVATE:{
-							tileentity.signText[1] = new TextComponentString(Formatter.format("&cPrivate Property"));
-							tileentity.signText[2] = new TextComponentString(Formatter.format("&c- - - -"));
+							tileentity.signText[1] = Formatter.format("&cPrivate Property");
+							tileentity.signText[2] = Formatter.format("&c- - - -");
 							break;
 						}
 						case PUBLIC:{
-							tileentity.signText[1] = new TextComponentString(Formatter.format("&cPublic Access"));
-							tileentity.signText[2] = new TextComponentString(Formatter.format("&cProperty"));
+							tileentity.signText[1] = Formatter.format("&cPublic Access");
+							tileentity.signText[2] = Formatter.format("&cProperty");
 							break;
 						}
 						default:
-							tileentity.signText[1] = new TextComponentString(Formatter.format("&9Managed"));
-							tileentity.signText[2] = new TextComponentString(Formatter.format("&9Property"));
+							tileentity.signText[1] = Formatter.format("&9Managed");
+							tileentity.signText[2] = Formatter.format("&9Property");
 							break;
 					}
 				}
 				if(chunk.getDistrict().getMunicipality().getState().getId() >= 0){
-					tileentity.signText[3] = new TextComponentString(Formatter.format("&2" + (chunk.getType() == ChunkType.PRIVATE ? Static.getPlayerNameByUUID(UUID.fromString(chunk.getOwner())) : chunk.getOwner())));
+					tileentity.signText[3] = Formatter.format("&2" + (chunk.getType() == ChunkType.PRIVATE ? Static.getPlayerNameByUUID(UUID.fromString(chunk.getOwner())) : chunk.getOwner()));
 				}
 				else{
-					tileentity.signText[3] = new TextComponentString(Formatter.format("&2Wilderness"));
+					tileentity.signText[3] = Formatter.format("&2Wilderness");
 				}
-				tileentity.signText[0] = new TextComponentString(Formatter.format("&0[&9States&0]&2> &8Chunk"));
+				tileentity.signText[0] = Formatter.format("&0[&9States&0]&2> &8Chunk");
 				break;
 			}
 			case "district":{
-				tileentity.signText[1] = new TextComponentString(Formatter.format("&9" + chunk.getDistrict().getName()));
-				tileentity.signText[2] = new TextComponentString(Formatter.format("&6" + chunk.getDistrict().getType().name().toLowerCase()));
-				tileentity.signText[3] = new TextComponentString(Formatter.format(chunk.getDistrict().getManager() == null ? "&cno manager" : "&2" + Static.getPlayerNameByUUID(chunk.getDistrict().getManager())));
+				tileentity.signText[1] = Formatter.format("&9" + chunk.getDistrict().getName());
+				tileentity.signText[2] = Formatter.format("&6" + chunk.getDistrict().getType().name().toLowerCase());
+				tileentity.signText[3] = Formatter.format(chunk.getDistrict().getManager() == null ? "&cno manager" : "&2" + Static.getPlayerNameByUUID(chunk.getDistrict().getManager()));
 				//
-				tileentity.signText[0] = new TextComponentString(Formatter.format("&0[&9States&0]&2> &8District"));
+				tileentity.signText[0] = Formatter.format("&0[&9States&0]&2> &8District");
 				break;
 			}
 			case "municipality":{
-				tileentity.signText[1] = new TextComponentString(Formatter.format("&9" + chunk.getDistrict().getMunicipality().getName()));
-				tileentity.signText[2] = new TextComponentString(Formatter.format("&6" + chunk.getDistrict().getMunicipality().getType().getTitle()));
-				tileentity.signText[3] = new TextComponentString(Formatter.format(chunk.getDistrict().getMunicipality().getMayor() == null ? "&cno mayor" : "&2" + Static.getPlayerNameByUUID(chunk.getDistrict().getMunicipality().getMayor())));
+				tileentity.signText[1] = Formatter.format("&9" + chunk.getDistrict().getMunicipality().getName());
+				tileentity.signText[2] = Formatter.format("&6" + chunk.getDistrict().getMunicipality().getType().getTitle());
+				tileentity.signText[3] = Formatter.format(chunk.getDistrict().getMunicipality().getMayor() == null ? "&cno mayor" : "&2" + Static.getPlayerNameByUUID(chunk.getDistrict().getMunicipality().getMayor()));
 				//
-				tileentity.signText[0] = new TextComponentString(Formatter.format("&0[&9St&0]&2> &8Municipality"));
+				tileentity.signText[0] = Formatter.format("&0[&9St&0]&2> &8Municipality");
 				break;
 			}
 			case "state":{
-				tileentity.signText[1] = new TextComponentString(Formatter.format("&9" + chunk.getDistrict().getMunicipality().getState().getName()));
-				tileentity.signText[2] = new TextComponentString(Formatter.format("&6 - - - "));
-				tileentity.signText[3] = new TextComponentString(Formatter.format(chunk.getDistrict().getMunicipality().getState().getLeader() == null ? "&cno mayor" : "&2" + Static.getPlayerNameByUUID(chunk.getDistrict().getMunicipality().getState().getLeader())));
+				tileentity.signText[1] = Formatter.format("&9" + chunk.getDistrict().getMunicipality().getState().getName());
+				tileentity.signText[2] = Formatter.format("&6 - - - ");
+				tileentity.signText[3] = Formatter.format(chunk.getDistrict().getMunicipality().getState().getLeader() == null ? "&cno mayor" : "&2" + Static.getPlayerNameByUUID(chunk.getDistrict().getMunicipality().getState().getLeader()));
 				//
-				tileentity.signText[0] = new TextComponentString(Formatter.format("&0[&9States&0]&2> &8State"));
+				tileentity.signText[0] = Formatter.format("&0[&9States&0]&2> &8State");
 				break;
 			}
 			case "map":{
-				tileentity.signText[0] = new TextComponentString(Formatter.format("&0[&9States&0]&2> &8Map"));
-				String str = tileentity.signText[2].getUnformattedText().toLowerCase();
+				tileentity.signText[0] = Formatter.format("&0[&9States&0]&2> &8Map");
+				String str = tileentity.signText[2].toLowerCase();
 				boolean found = false;
 				for(String string : Listener.MAP_VIEW_MODES){
 					if(str.equals(string)){
@@ -120,9 +121,9 @@ public class SignTileEntityImplementation implements SignTileEntityCapability {
 				if(!found){
 					str = "surface";
 				}
-				tileentity.signText[1] = new TextComponentString(str);
-				tileentity.signText[2] = new TextComponentString(Formatter.format("&7" + chunk.xCoord() + "x"));
-				tileentity.signText[3] = new TextComponentString(Formatter.format("&7" + chunk.zCoord() + "z"));
+				tileentity.signText[1] = str;
+				tileentity.signText[2] = Formatter.format("&7" + chunk.xCoord() + "x");
+				tileentity.signText[3] = Formatter.format("&7" + chunk.zCoord() + "z");
 				break;
 			}
 			default:{
@@ -135,7 +136,7 @@ public class SignTileEntityImplementation implements SignTileEntityCapability {
 		//
 		if(send){
 			Static.getServer().getPlayerList().getPlayers().forEach(player -> {
-				player.connection.sendPacket(tileentity.getUpdatePacket());
+				player.connection.sendPacket(tileentity.getDescriptionPacket());
 			});
 		}
 	}
@@ -177,23 +178,23 @@ public class SignTileEntityImplementation implements SignTileEntityCapability {
 		Print.debug(player, chunk.toJsonObject());
 		switch(mode){
 			case "chunk":{
-				Static.getServer().commandManager.executeCommand(player, chunk.getPrice() > 0 ? ("ck buy via-sign " + tileentity.getPos().toLong()) : "ck info");
+				MinecraftServer.getServer().getCommandManager().executeCommand(player, chunk.getPrice() > 0 ? ("ck buy via-sign " + tileentity.getPos().toLong()) : "ck info");
 				break;
 			}
 			case "district":{
-				Static.getServer().commandManager.executeCommand(player, "dis info");
+				MinecraftServer.getServer().getCommandManager().executeCommand(player, "dis info");
 				break;
 			}
 			case "municipality":{
-				Static.getServer().commandManager.executeCommand(player, "mun info");
+				MinecraftServer.getServer().getCommandManager().executeCommand(player, "mun info");
 				break;
 			}
 			case "state":{
-				Static.getServer().commandManager.executeCommand(player, "st info");
+				MinecraftServer.getServer().getCommandManager().executeCommand(player, "st info");
 				break;
 			}
 			case "map":{
-				String str = tileentity.signText[1].getUnformattedText().toLowerCase().replace("s.", "surface_");
+				String str = tileentity.signText[1].toLowerCase().replace("s.", "surface_");
 				int j = -1;
 				for(int i = 0; i < Listener.MAP_VIEW_MODES.length; i++){
 					if(Listener.MAP_VIEW_MODES[i].equals(str)){
@@ -202,7 +203,7 @@ public class SignTileEntityImplementation implements SignTileEntityCapability {
 					}
 				}
 				if(j < 0){ j = 0; }
-				player.openGui(States.INSTANCE, 1, player.world, j, 0, 0);
+				player.openGui(States.INSTANCE, 1, player.worldObj, j, 0, 0);
 				break;
 			}
 			default:{

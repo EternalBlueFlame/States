@@ -13,14 +13,15 @@ import net.fexcraft.mod.states.api.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.events.PlayerEvents;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.fexcraft.mod.states.util.StatesPermissions;
-import net.minecraft.block.BlockWallSign;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockSign;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntitySign;
+import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.capabilities.Capability;
@@ -47,7 +48,7 @@ public class SignShop implements SignCapability.Listener {
 	}
 
 	@Override
-	public boolean onPlayerInteract(SignCapability cap, PlayerInteractEvent event, IBlockState state,TileEntitySign tileentity){
+	public boolean onPlayerInteract(SignCapability cap, PlayerInteractEvent event, Block state, TileEntitySign tileentity){
 		if(event.world.isRemote){ return false; }
 		if(!active){
 			if(tileentity.signText[0].toLowerCase().equals("[st-shop]")){
@@ -55,13 +56,13 @@ public class SignShop implements SignCapability.Listener {
 					Print.chat(event.entityPlayer, "Invalid type on line 4.");
 					return false;
 				}
-				tileentity.signText[0] = Formatter.newTextComponentString("&0[&3St&8-&3Shop&0]");
+				tileentity.signText[0] = Formatter.format("&0[&3St&8-&3Shop&0]");
 				TileEntity te = event.world.getTileEntity(getPosAtBack(state, tileentity));
-				EnumFacing facing = state.getBlock() instanceof BlockWallSign ? EnumFacing.getFront(tileentity.getBlockMetadata()) : null;
-				if(te != null && te.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing) && PlayerEvents.checkAccess(te.getWorld(), te.getPos(), te.getWorld().getBlockState(te.getPos()), event.entityPlayer)){
+				EnumFacing facing = state instanceof BlockSign ? EnumFacing.getFront(tileentity.getBlockMetadata()) : null;
+				if(te != null && te.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing) && PlayerEvents.checkAccess(te.getWorldObj(), te.getPos(), te.getWorld().getBlockState(te.getPos()), event.entityPlayer)){
 					itemtype = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing).getStackInSlot(0).copy();
 					if(!tileentity.signText[1].equals("")){
-						Chunk chunk = StateUtil.getChunk(te.getPos());
+						Chunk chunk = StateUtil.getChunk(te.xCoord,te.zCoord);
 						switch(tileentity.signText[1].toLowerCase()){
 							case "district":
 							case "municipality":{
@@ -105,10 +106,10 @@ public class SignShop implements SignCapability.Listener {
 					if(account == null){
 						account = event.entityPlayer.getCapability(StatesCapabilities.PLAYER, null).getAccount().getAsResourceLocation();
 					}
-					tileentity.signText[1] = new TextComponentString(itemtype.getDisplayName());
+					tileentity.signText[1] = Formatter.format(itemtype.getDisplayName());
 					try{
 						long leng = Long.parseLong(tileentity.signText[2]);
-						tileentity.signText[2] = Formatter.newTextComponentString(Config.getWorthAsString(leng, true, leng < 10));
+						tileentity.signText[2] = Formatter.format(Config.getWorthAsString(leng, true, leng < 10));
 						price = leng;
 					}
 					catch(Exception e){
@@ -122,15 +123,15 @@ public class SignShop implements SignCapability.Listener {
 					return true;
 				}
 				else{
-					Print.bar(event.entityPlayer, "No ItemStack Container found.");
+					event.entityPlayer.addChatComponentMessage(new ChatComponentText(Formatter.format("No ItemStack Container found.")));
 				}
 			}
 		}
 		else{
 			TileEntity te = event.world.getTileEntity(getPosAtBack(state, tileentity));
-			EnumFacing facing = state.getBlock() instanceof BlockWallSign ? EnumFacing.getFront(tileentity.getBlockMetadata()) : null;
+			EnumFacing facing = state.getBlock() instanceof BlockSign ? EnumFacing.getFront(tileentity.getBlockMetadata()) : null;
 			if(te != null && te.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing)){
-				if(event.entityPlayer.getHeldItemMainhand().isEmpty()){
+				if(event.entityPlayer.getHeldItem() ==null){
 					Account shop = DataManager.getAccount(account.toString(), true, false);
 					if(shop == null){
 						Print.chat(event.entityPlayer, "Shop Account couldn't be loaded.");
@@ -143,8 +144,8 @@ public class SignShop implements SignCapability.Listener {
 					if(tileentity.signText[3].toLowerCase().startsWith("buy")){
 						if(hasStack(event.entityPlayer, te_handler, false)){
 							if(playerbank.processAction(Bank.Action.TRANSFER, event.entityPlayer, playeracc, price, shop)){
-								event.entityPlayer.addItemStackToInventory(getStackIfPossible(te_handler, false));
-								Print.bar(event.entityPlayer, "Items bought.");
+								event.entityPlayer.inventory.addItemStackToInventory(getStackIfPossible(te_handler, false));
+								event.entityPlayer.addChatComponentMessage(new ChatComponentText(Formatter.format("Items bought.")));
 							}
 						}
 					}
@@ -152,7 +153,7 @@ public class SignShop implements SignCapability.Listener {
 						if(hasStack(event.entityPlayer, pl_handler, true) && hasSpace(event.entityPlayer, te_handler)){
 							if(DataManager.getBank(shop.getBankId(), true, false).processAction(Bank.Action.TRANSFER, event.entityPlayer, shop, price, playeracc)){
 								addStack(te_handler, getStackIfPossible(pl_handler, true));
-								Print.bar(event.entityPlayer, "Items sold.");
+								event.entityPlayer.addChatComponentMessage(new ChatComponentText(Formatter.format("Items sold.")));
 							}
 						}
 					}
@@ -175,7 +176,7 @@ public class SignShop implements SignCapability.Listener {
 				return true;
 			}
 			else{
-				Print.bar(event.entityPlayer, "No ItemStack Container linked.");
+				event.entityPlayer.addChatComponentMessage(new ChatComponentText(Formatter.format("No ItemStack Container linked.")));
 			}
 		}
 		return false;
@@ -184,7 +185,7 @@ public class SignShop implements SignCapability.Listener {
 	private void addStack(IItemHandler handler, ItemStack stack){
 		if(server){ return; }
 		for(int i = 0; i < handler.getSlots(); i++){
-			if((stack = handler.insertItem(i, stack, false)).isEmpty()){
+			if((stack = handler.insertItem(i, stack, false)) ==null){
 				return;
 			}
 		}
@@ -193,11 +194,11 @@ public class SignShop implements SignCapability.Listener {
 	private boolean hasSpace(EntityPlayer player, IItemHandler handler){
 		if(server){ return true; }
 		for(int i = 0; i < handler.getSlots(); i++){
-			if(handler.getStackInSlot(i).isEmpty() || isEqualOrValid(handler.getStackInSlot(i), true)){
+			if(handler.getStackInSlot(i) ==null || isEqualOrValid(handler.getStackInSlot(i), true)){
 				return true;
 			}
 		}
-		Print.bar(player, "Not enough space in Container.");
+		player.addChatComponentMessage(new ChatComponentText(Formatter.format("Not enough space in Container.")));
 		return false;
 	}
 
@@ -208,12 +209,12 @@ public class SignShop implements SignCapability.Listener {
 				return true;
 			}
 		}
-		Print.bar(player, "Not enough Items in " + (plinv ? "Inventory" : "Container") + ".");
+		player.addChatComponentMessage(new ChatComponentText(Formatter.format( "Not enough Items in " + (plinv ? "Inventory" : "Container") + ".")));
 		return false;
 	}
 
 	private boolean isEqualOrValid(ItemStack stack, boolean reversecheck){
-		if(reversecheck ? stack.getCount() + itemtype.getCount() > stack.getMaxStackSize() : stack.getCount() < itemtype.getCount()){
+		if(reversecheck ? stack.stackSize + itemtype.stackSize > stack.getMaxStackSize() : stack.stackSize < itemtype.stackSize){
             return false;
         }
         else if(stack.getItem() != itemtype.getItem()){
@@ -236,7 +237,7 @@ public class SignShop implements SignCapability.Listener {
 		}
 		for(int i = 0; i < handler.getSlots(); i++){
 			if(isEqualOrValid(handler.getStackInSlot(i), false)){
-				return handler.extractItem(i, itemtype.getCount(), false);
+				return handler.extractItem(i, itemtype.stackSize, false);
 			}
 		}
 		return null;

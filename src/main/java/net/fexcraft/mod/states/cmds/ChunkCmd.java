@@ -2,6 +2,7 @@ package net.fexcraft.mod.states.cmds;
 
 import java.util.UUID;
 
+import net.fexcraft.mod.states.util.*;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import com.mojang.authlib.GameProfile;
@@ -20,12 +21,7 @@ import net.fexcraft.mod.states.api.ChunkPos;
 import net.fexcraft.mod.states.api.ChunkType;
 import net.fexcraft.mod.states.api.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.api.capabilities.StatesCapabilities;
-import net.fexcraft.mod.states.util.ImageCache;
-import net.fexcraft.mod.states.util.StateLogger;
-import net.fexcraft.mod.states.util.StateUtil;
-import net.fexcraft.mod.states.util.StatesPermissions;
 import net.minecraft.command.CommandBase;
-import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
@@ -92,7 +88,7 @@ public class ChunkCmd extends CommandBase {
 					Print.chat(sender, "&7/ck claim <district>");
 					return;
 				}
-				if(!NumberUtils.isCreatable(args[1])){
+				if(!NumberUtil.isCreatable(args[1])){
 					Print.chat(sender, "&7Please enter the numerical district ID as second argument!");
 					return;
 				}
@@ -502,7 +498,7 @@ public class ChunkCmd extends CommandBase {
 								StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, StateLogger.player(player) + " " + (bool ? "enabled" : "disabled") + " chunk force-loading at " + StateLogger.chunk(chunk) + ", in the District of " + StateLogger.district(chunk.getDistrict()) + ", which is in " + StateLogger.municipality(chunk.getMunicipality()) + ".");
 								//
 								Bank bank = chunk.getMunicipality().getBank();
-								bank.processAction(Bank.Action.TRANSFER, Static.getServer(), chunk.getMunicipality().getAccount(), net.fexcraft.mod.states.util.Config.LOADED_CHUNKS_TAX, States.SERVERACCOUNT);
+								bank.processAction(Bank.Action.TRANSFER, MinecraftServer.getServer(), chunk.getMunicipality().getAccount(), net.fexcraft.mod.states.util.Config.LOADED_CHUNKS_TAX, States.SERVERACCOUNT);
 								return;
 							}
 							break;
@@ -519,7 +515,7 @@ public class ChunkCmd extends CommandBase {
 									chunk.setCustomTax(0); chunk.save();
 									Print.chat(sender, "&9Chunk's Custom Tax was reset!");
 								}
-								else if(NumberUtils.isCreatable(args[2])){
+								else if(NumberUtil.isCreatable(args[2])){
 									chunk.setCustomTax(Long.parseLong(args[2])); chunk.save();
 									Print.chat(sender, "&9Chunk's Custom Tax was set! (" + ggas(chunk.getCustomTax()) + ")");
 								}
@@ -601,7 +597,7 @@ public class ChunkCmd extends CommandBase {
 								//TODO companies
 								return;
 							}
-							GameProfile gp = Static.getServer().getPlayerProfileCache().getGameProfileForUsername(args[2]);
+							GameProfile gp = MinecraftServer.getServer().func_152358_ax().func_152655_a(args[2]);
 							if(gp == null){
 								Print.chat(sender, "&7Player not found.");
 							}
@@ -674,7 +670,7 @@ public class ChunkCmd extends CommandBase {
 	private boolean isPermitted(Chunk chunk, EntityPlayer player){
 		if(chunk.getLink() != null){
 			ChunkPos link = chunk.getLink();
-			Print.chat(player, "&7Chunk is linked to a chunk at &2" + link.x + "x&7, &2" + link.z + "z&7.");
+			Print.chat(player, "&7Chunk is linked to a chunk at &2" + link.posX + "x&7, &2" + link.posZ + "z&7.");
 			Print.chat(player, "&7Please make changes to that chunk, they will be copied to this one.");
 			Print.chat(player, "&7Alternatively unlink this chunk.");
 			return false;

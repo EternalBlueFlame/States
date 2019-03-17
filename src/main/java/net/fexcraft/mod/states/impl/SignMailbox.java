@@ -15,12 +15,13 @@ import net.fexcraft.mod.states.events.PlayerEvents;
 import net.fexcraft.mod.states.objects.MailItem;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.fexcraft.mod.states.util.StatesPermissions;
-import net.minecraft.block.BlockWallSign;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockSign;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.tileentity.TileEntitySign;
@@ -50,17 +51,17 @@ public class SignMailbox implements SignCapability.Listener {
 	}
 
 	@Override
-	public boolean onPlayerInteract(SignCapability cap, PlayerInteractEvent event, IBlockState state, TileEntitySign tileentity){
+	public boolean onPlayerInteract(SignCapability cap, PlayerInteractEvent event, Block state, TileEntitySign tileentity){
 		if(event.world.isRemote){ return false; }
 		if(!active){
 			if(tileentity.signText[0].toLowerCase().equals("[st-mailbox]")){
 				TileEntity te = event.world.getTileEntity(getPosAtBack(state, tileentity));
 				if(te == null){ Print.chat(event.entityPlayer, "Not a valid mailbox position."); return false; }
-				EnumFacing facing = state.getBlock() instanceof BlockWallSign ? EnumFacing.getFront(tileentity.getBlockMetadata()) : null;
+				EnumFacing facing = state instanceof BlockSign ? EnumFacing.getFront(tileentity.getBlockMetadata()) : null;
 				if(!te.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing)){
 					Print.chat(event.entityPlayer, "Block/TileEntity cannot store items."); return false;
 				}
-				if(!PlayerEvents.checkAccess(te.getWorldObj(), te.xCoord, te.yCoord, te.zCoord, te.getWorldObj().getBlockState(te.getPos()), event.entityPlayer)){
+				if(!PlayerEvents.checkAccess(te.getWorldObj(), te.xCoord, te.yCoord, te.zCoord, event.entityPlayer)){
 					Print.chat(event.entityPlayer, "Block/TileEntity cannot be accessed."); return false;
 				}
 				Chunk chunk = StateUtil.getChunk(tileentity);
@@ -84,14 +85,14 @@ public class SignMailbox implements SignCapability.Listener {
 					case "company": break;//TODO
 					case "player":{
 						String rec = tileentity.signText[2].toLowerCase();
-						com.mojang.authlib.GameProfile prof = Static.getServer().getPlayerProfileCache().getGameProfileForUsername(rec);
+						com.mojang.authlib.GameProfile prof = MinecraftServer.getServer().func_152358_ax().func_152655_a(rec);
 						if(prof == null){
 							Print.chat(event.entityPlayer, "Couldn't find player UUID in cache.");
 							return false;
 						}
 						if(prof.getId().equals(event.entityPlayer.getGameProfile().getId()) || StatesPermissions.hasPermission(event.entityPlayer, "admin", null)){
 							this.recipient = prof.getId();
-							tileentity.signText[1] = Formatter.newTextComponentString(prof.getName());
+							tileentity.signText[1] = Formatter.format(prof.getName());
 							tileentity.signText[2] = "";
 						}//TODO municipality check
 						else{
@@ -110,7 +111,7 @@ public class SignMailbox implements SignCapability.Listener {
 						return false;
 					}
 				}
-				tileentity.signText[0] = Formatter.newTextComponentString("&0[&3Mailbox&0]");
+				tileentity.signText[0] = Formatter.format("&0[&3Mailbox&0]");
 				try{
 					switch(type){
 						case "state": chunk.getState().setMailbox(tileentity); break;
@@ -202,16 +203,16 @@ public class SignMailbox implements SignCapability.Listener {
 		if(compound != null) nbt.setTag("StatesData", compound);
 		if(expiry > 0) nbt.setLong("Expiry", Time.getDate() + expiry);
 		stack.setTagCompound(nbt);
-		EnumFacing facing = tile.getWorld().getBlockState(tile.getPos()).getBlock() instanceof BlockWallSign ? EnumFacing.getFront(tile.getBlockMetadata()) : null;
-		TileEntity te = tile.getWorld().getTileEntity(getPosAtBack(tile.getWorld().getBlockState(tile.getPos()), tile));
+		EnumFacing facing = tile.getWorldObj().getBlock(tile.xCoord,tile.yCoord,tile.zCoord) instanceof BlockSign ? EnumFacing.getFront(tile.getBlockMetadata()) : null;
+		TileEntity te = tile.getWorldObj().getTileEntity(getPosAtBack(tile.getWorldObj().getBlock(tile.xCoord,tile.yCoord,tile.zCoord), tile));
 		IItemHandler handler = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing);
 		for(int i = 0; i < handler.getSlots(); i++){
-			if(handler.insertItem(i, stack, true).isEmpty()){
+			if(handler.insertItem(i, stack, true)==null){
 				stack = handler.insertItem(i, stack, false);
-				if(stack == null || stack.isEmpty()) break;
+				if(stack == null) break;
 			}
 		}
-		if(stack == null || !stack.isEmpty()){
+		if(stack == null){
 			if(ics != null) Print.chat(ics, "Failed to send mail, mailbox of recipient may be full!");
 			Print.log("Failed to insert mail! Probably no space in target mailbox!");
 			Print.log(tile + " || " + rectype + " || " + receiver + " || " + sender + " || " + message + " || " + type + " || " + expiry + " || " + compound);

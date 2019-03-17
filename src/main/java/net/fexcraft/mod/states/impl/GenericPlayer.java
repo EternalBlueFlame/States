@@ -21,6 +21,9 @@ import net.fexcraft.mod.states.util.StateUtil;
 import net.fexcraft.mod.states.util.TaxSystem;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ChunkCoordinates;
+import net.minecraft.util.IChatComponent;
 import net.minecraft.util.math.BlockPos;
 
 public class GenericPlayer implements PlayerCapability {
@@ -228,7 +231,7 @@ public class GenericPlayer implements PlayerCapability {
 
 	@Override
 	public String getWebhookNickname(){
-		return nick == null ? entity.getName() : nick + " (" + entity.getName() + ")";
+		return nick == null ? entity.getDisplayName() : nick + " (" + entity.getDisplayName() + ")";
 	}
 
 	@Override
@@ -295,6 +298,11 @@ public class GenericPlayer implements PlayerCapability {
 	}
 
 	@Override
+	public void setMailbox(TileEntity pos){
+		this.mailbox = new BlockPos(pos);
+	}
+
+	@Override
 	public void copyFromOld(PlayerCapability capability){
 		GenericPlayer player = (GenericPlayer)capability;
 		this.nick = player.nick;
@@ -310,5 +318,14 @@ public class GenericPlayer implements PlayerCapability {
 		this.mailbox = player.mailbox;
 		this.municipality = player.municipality;
 	}
+
+	@Override
+	public IChatComponent func_145748_c_(){}
+
+	@Override
+	public void addChatMessage(IChatComponent text){}
+
+	@Override
+	public ChunkCoordinates getPlayerCoordinates(){return getEntityPlayer().playerLocation;}
 
 }

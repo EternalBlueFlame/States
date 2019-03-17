@@ -9,7 +9,7 @@ import java.util.TreeMap;
 import javax.annotation.Nullable;
 
 import net.fexcraft.lib.common.math.Time;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.SimpleTexture;
 import net.minecraft.client.renderer.texture.TextureUtil;
@@ -73,8 +73,8 @@ public class ImageUtil extends TimerTask {
 	        for(int i = 0; i < 16; i++){
 				for(int j = 0; j < 16; j++){
 					BlockPos pos = getPos(world, i + (x * 16), j + (z * 16));
-					IBlockState state = world.getBlockState(pos);
-					bufferedImage.setRGB(i, j, new Color(state.getMapColor(world, pos).colorValue).getRGB());
+					Block state = world.getBlock(pos.getX(),pos.getY(),pos.getZ());
+					bufferedImage.setRGB(i, j, new Color(state.getMapColor(0).colorValue).getRGB());
 				}
 			}
 	        if(this.bufferedImage != null){
@@ -88,7 +88,7 @@ public class ImageUtil extends TimerTask {
 		private static final BlockPos getPos(World world, int x, int z){
 			for(int i = 255; i > 0; i--){
 				BlockPos pos = new BlockPos(x, i, z);
-				if(world.getBlockState(pos).getBlock() != Blocks.AIR){
+				if(world.getBlock(pos.getX(),pos.getY(),pos.getZ()) != Blocks.air){
 					return pos;
 				}
 			}

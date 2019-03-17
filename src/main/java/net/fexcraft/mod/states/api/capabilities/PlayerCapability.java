@@ -17,7 +17,6 @@ import net.fexcraft.mod.states.api.root.MailReceiver;
 import net.fexcraft.mod.states.api.root.Taxable;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;
 
 public interface PlayerCapability extends ICommandSender, Taxable, AccountHolder, MailReceiver {
@@ -88,12 +87,12 @@ public interface PlayerCapability extends ICommandSender, Taxable, AccountHolder
 	/// ---- ///
 
 	@Override
-	public default String getName(){
+	public default String getCommandSenderName(){
 		return this.getEntityPlayer().getDisplayName();
 	}
 
 	@Override
-	public default boolean canUseCommand(int permLevel, String commandName){
+	public default boolean canCommandSenderUseCommand(int permLevel, String commandName){
 		return this.getEntityPlayer().canCommandSenderUseCommand(permLevel, commandName);
 	}
 
@@ -102,10 +101,6 @@ public interface PlayerCapability extends ICommandSender, Taxable, AccountHolder
 		return this.getEntityPlayer().getEntityWorld();
 	}
 
-	@Override
-	public default MinecraftServer getServer(){
-		return MinecraftServer.getServer();
-	}
 
 	public boolean isLoaded();
 

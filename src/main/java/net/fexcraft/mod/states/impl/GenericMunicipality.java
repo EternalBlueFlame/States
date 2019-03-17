@@ -25,6 +25,7 @@ import net.fexcraft.mod.states.util.Config;
 import net.fexcraft.mod.states.util.ForcedChunksManager;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 
 public class GenericMunicipality implements Municipality/*, Taxable*/ {
@@ -347,6 +348,11 @@ public class GenericMunicipality implements Municipality/*, Taxable*/ {
 	@Override
 	public void setMailbox(BlockPos pos){
 		this.mailbox = pos;
+	}
+
+	@Override
+	public void setMailbox(TileEntity pos){
+		this.mailbox = new BlockPos(pos);
 	}
 
 }

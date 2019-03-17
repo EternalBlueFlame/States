@@ -14,7 +14,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.stream.JsonWriter;
 
 import net.fexcraft.mod.fsmm.util.Print;
-import net.fexcraft.lib.mc.utils.Static;
 import net.fexcraft.mod.lib.fcl.Formatter;
 import net.fexcraft.mod.lib.fcl.JsonUtil;
 import net.fexcraft.mod.states.api.capabilities.PlayerCapability;
@@ -22,8 +21,8 @@ import net.fexcraft.mod.states.api.capabilities.StatesCapabilities;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.event.ClickEvent;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.ChatComponentText;
 
 public class MessageSender {
     
@@ -31,7 +30,7 @@ public class MessageSender {
     
     public static void to(ICommandSender receiver, String message){
         if(receiver == null){ Print.log("RECEIVER NULL || " + message); }
-        receiver.sendMessage(new TextComponentString(Formatter.format(message)));
+        receiver.addChatMessage(new ChatComponentText(Formatter.format(message)));
     }
     
     public static void as(EntityPlayer sender, String message){ as(sender, message, true); }
@@ -40,21 +39,21 @@ public class MessageSender {
     	PlayerCapability cap = null;
     	String name = sender == null ? "&9#&8] &2" + Config.WEBHOOK_BROADCASTER_NAME :
     		"&" + (StateUtil.isAdmin(sender) ? "4" : "6") + "#&8] " + sender.getCapability(StatesCapabilities.PLAYER, null).getFormattedNickname(); 
-        Static.getServer().getPlayerList().sendMessage(new TextComponentString(Formatter.format(name + "&0: &7" + message)));
+        MinecraftServer.getServer().addChatMessage(new ChatComponentText(Formatter.format(name + "&0: &7" + message)));
         if(webhook) toWebhook(cap, message);
     }
     
     public static void fromDiscord(JsonObject obj){
         String name = "&5#&8] &2" + obj.get("username").getAsString();
-        ITextComponent text = null;
+        ChatComponentText text = null;
         if(obj.get("content").isJsonArray()){
-            text = new TextComponentString(Formatter.format(name + "&0: " + obj.get("content").getAsJsonArray().get(0).getAsString()));
-            text.getStyle().setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, obj.get("content").getAsJsonArray().get(1).getAsString()));
+            text = new ChatComponentText(Formatter.format(name + "&0: " + obj.get("content").getAsJsonArray().get(0).getAsString()));
+            text.getChatStyle().setChatClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, obj.get("content").getAsJsonArray().get(1).getAsString()));
         }
         else{
-            text = new TextComponentString(Formatter.format(name + "&0: &7" + obj.get("content").getAsString()));
+            text = new ChatComponentText(Formatter.format(name + "&0: &7" + obj.get("content").getAsString()));
         }
-        Static.getServer().getPlayerList().sendMessage(text);
+        MinecraftServer.getServer().addChatMessage(text);
     }
     
     public static void toWebhook(PlayerCapability sender, String message){

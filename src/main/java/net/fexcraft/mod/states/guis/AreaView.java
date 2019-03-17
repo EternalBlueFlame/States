@@ -2,6 +2,7 @@ package net.fexcraft.mod.states.guis;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import net.fexcraft.lib.common.math.RGB;
 import net.fexcraft.lib.mc.network.packet.PacketNBTTagCompound;
@@ -24,6 +25,7 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
+import org.lwjgl.opengl.GL11;
 
 public class AreaView extends GuiContainer {
 
@@ -94,14 +96,14 @@ public class AreaView extends GuiContainer {
 			@Override
 			public void drawButton(Minecraft mc, int mouseX, int mouseY, float f){
 				if(!this.visible){ return; }
-				GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+				GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 				mc.getTextureManager().bindTexture(texture);
-				this.hovered = mouseX >= this.xPosition && mouseY >= this.yPosition && mouseX < this.xPosition + this.width && mouseY < this.yPosition + this.height;
-				if(this.hovered){ HOVERCLR.glColorApply(); }
+				this.field_146123_n = mouseX >= this.xPosition && mouseY >= this.yPosition && mouseX < this.xPosition + this.width && mouseY < this.yPosition + this.height;
+				if(this.field_146123_n){ HOVERCLR.glColorApply(); }
 				else{ if(terrain){ ONCLR.glColorApply(); } else { OFFCLR.glColorApply(); }}
 				this.drawTexturedModalRect(this.x, this.y, 238, 69, this.width, this.height);
 				RGB.glColorReset();
-				if(hovered){
+				if(field_146123_n){
 					instance.drawHoveringText((!instance.terrain ? "Enable" : "Disable") + " Terrain", mouseX, mouseY,fontRendererObj);
 				}
 			}
@@ -184,12 +186,12 @@ public class AreaView extends GuiContainer {
 		public void drawButton(Minecraft mc, int mouseX, int mouseY, float f){
 			if(!this.visible){ return; }
 			mc.getTextureManager().bindTexture(texture);
-			this.hovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
-			if(this.hovered){ HOVERCLR.glColorApply(); }
-			this.drawTexturedModalRect(this.x, this.y, tx, ty, this.width, this.height);
-			if(this.hovered){ RGB.glColorReset(); }
-			if(hovered){
-				instance.drawHoveringText(this.displayString, mouseX, mouseY);
+			this.field_146123_n = mouseX >= this.xPosition && mouseY >= this.yPosition && mouseX < this.xPosition + this.width && mouseY < this.yPosition + this.height;
+			if(this.field_146123_n){ HOVERCLR.glColorApply(); }
+			this.drawTexturedModalRect(this.xPosition, this.yPosition, tx, ty, this.width, this.height);
+			if(this.field_146123_n){ RGB.glColorReset(); }
+			if(field_146123_n){
+				instance.drawHoveringText(Collections.singletonList(this.displayString), mouseX, mouseY, Minecraft.getMinecraft().fontRenderer);
 			}
 		}
 		
@@ -209,14 +211,14 @@ public class AreaView extends GuiContainer {
 		}
 		
 		@Override
-		public void drawButton(Minecraft mc, int mouseX, int mouseY, float partialTicks){
+		public void drawButton(Minecraft mc, int mouseX, int mouseY){
 			if(!visible){ return; }
 			mc.getTextureManager().bindTexture(instance.terrain ? map_texture : empty_tex);
-            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-            GlStateManager.enableBlend();
+            GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+            GL11.glEnable(GL11.GL_BLEND);
             GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
-            GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-            this.hovered = mouseX >= this.xPosition && mouseY >= this.yPosition && mouseX < this.xPosition + this.width && mouseY < this.yPosition + this.height;
+            GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+            this.field_146123_n = mouseX >= this.xPosition && mouseY >= this.yPosition && mouseX < this.xPosition + this.width && mouseY < this.yPosition + this.height;
             xx = mouseX - xPosition; yy = mouseY - this.yPosition;
             if(xx >= 224){ xx = -1; } if(yy >= 224){ yy = -1; }
             if(instance.list == null){ return; }

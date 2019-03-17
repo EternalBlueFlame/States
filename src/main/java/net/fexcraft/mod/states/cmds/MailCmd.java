@@ -162,7 +162,7 @@ public class MailCmd extends CommandBase {
 						receiver = uuid.toString();
 					}
 					catch(Exception e){
-						receiver = Static.getServer().getPlayerProfileCache().getGameProfileForUsername(receiver).getId().toString();
+						receiver = MinecraftServer.getServer().func_152358_ax().func_152655_a(receiver).getId().toString();
 					}
 					String msg = args[2];
 					if(args.length > 3){

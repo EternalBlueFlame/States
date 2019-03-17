@@ -2,6 +2,7 @@ package net.fexcraft.mod.states.api;
 
 import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.chunk.Chunk;
 
 public class ChunkPos extends ChunkCoordinates {
@@ -21,5 +22,7 @@ public class ChunkPos extends ChunkCoordinates {
         if(result != 0){ return result; }
         return this.posX < 0 ? (o.posX < 0 ? o.posZ - this.posZ : -1) : (o.posX < 0 ? 1 : this.posZ - o.posZ);
 	}
+
+	public ChunkCoordIntPair getChunkCoords(){return new ChunkCoordIntPair(posX,posZ);}
 	
 }

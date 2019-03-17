@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.UUID;
 
+import net.fexcraft.mod.states.util.NumberUtil;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import com.mojang.authlib.GameProfile;
@@ -70,7 +71,7 @@ public class StateCmd extends CommandBase {
 			Print.chat(sender, "&7/st buy");
 			return;
 		}
-		EntityPlayer player = (EntityPlayer)sender.getCommandSenderEntity();
+		EntityPlayer player = (EntityPlayer)sender;
 		PlayerCapability ply = player.getCapability(StatesCapabilities.PLAYER, null);
 		if(ply == null){
 			Print.chat(sender, "&o&4There was an error loading your Playerdata.");
@@ -128,7 +129,7 @@ public class StateCmd extends CommandBase {
 								Print.chat(sender, "&9Missing Argument!");
 								break;
 							}
-							GameProfile gp = Static.getServer().getPlayerProfileCache().getGameProfileForUsername(args[2]);
+							GameProfile gp = MinecraftServer.getServer().func_152358_ax().func_152655_a(args[2]);
 							if(gp == null || gp.getId() == null){
 								Print.chat(sender, "&cPlayer not found in Cache.");
 								break;
@@ -275,7 +276,7 @@ public class StateCmd extends CommandBase {
 								state.setChunkTaxPercentage((byte)0); state.save();
 								Print.chat(sender, "&State's Chunk Tax Percentage was reset!");
 							}
-							else if(NumberUtils.isCreatable(args[2])){
+							else if(NumberUtil.isCreatable(args[2])){
 								byte byt = Byte.parseByte(args[2]);
 								if(byt > 100){ byt = 100; } if(byt < 0){ byt = 0; }
 								state.setChunkTaxPercentage(byt); state.save();
@@ -293,7 +294,7 @@ public class StateCmd extends CommandBase {
 								state.setCitizenTaxPercentage((byte)0); state.save();
 								Print.chat(sender, "&State's Citizen Tax Percentage was reset!");
 							}
-							else if(NumberUtils.isCreatable(args[2])){
+							else if(NumberUtil.isCreatable(args[2])){
 								byte byt = Byte.parseByte(args[2]);
 								if(byt > 100){ byt = 100; } if(byt < 0){ byt = 0; }
 								state.setCitizenTaxPercentage(byt); state.save();
@@ -334,7 +335,7 @@ public class StateCmd extends CommandBase {
 							Print.chat(sender, "&9Missing Argument.");
 							return;
 						}
-						GameProfile gp = Static.getServer().getPlayerProfileCache().getGameProfileForUsername(args[2]);
+						GameProfile gp = MinecraftServer.getServer().func_152358_ax().func_152655_a(args[2]);
 						if(gp == null){
 							Print.chat(sender, "&eGameProfile not found.");
 							return;
@@ -345,7 +346,7 @@ public class StateCmd extends CommandBase {
 						}
 						state.getCouncil().remove(gp.getId());
 						state.save();
-						StateUtil.announce(server, AnnounceLevel.MUNICIPALITY, gp.getName() + " &9was removed from the State Council!", state.getId());
+						StateUtil.announce(MinecraftServer.getServer(), AnnounceLevel.MUNICIPALITY, gp.getName() + " &9was removed from the State Council!", state.getId());
 						StateLogger.log(StateLogger.LoggerType.STATE, StateLogger.player(player) + " removed " + StateLogger.player(gp) + " from the council of " + StateLogger.state(state) + ".");
 						break;
 					}
@@ -368,7 +369,7 @@ public class StateCmd extends CommandBase {
 							Print.chat(sender, "&7/mun council invite <playername> <optional:message>");
 							return;
 						}
-						GameProfile gp = server.getPlayerProfileCache().getGameProfileForUsername(args[2]);
+						GameProfile gp = MinecraftServer.getServer().func_152358_ax().func_152655_a(args[2]);
 						if(gp == null || gp.getId() == null){
 							Print.chat(sender, "&cPlayer not found.");
 							return;

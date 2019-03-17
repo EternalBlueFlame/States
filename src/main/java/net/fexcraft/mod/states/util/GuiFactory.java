@@ -22,7 +22,7 @@ public class GuiFactory implements IModGuiFactory {
 	public Set<RuntimeOptionCategoryElement> runtimeGuiCategories(){
 		return null;
 	}
-	
+
 	public static class ConfigGui extends GuiConfig {
 
 		public ConfigGui(GuiScreen parent){
@@ -36,14 +36,17 @@ public class GuiFactory implements IModGuiFactory {
 		
 	}
 
-	@Override
-	public boolean hasConfigGui(){
-		return true;
+	//@Override
+	//public boolean hasConfigGui(){return true;}
+	public Class<? extends GuiScreen> mainConfigGuiClass(){
+		return ConfigGui.class;
 	}
 
-	@Override
-	public GuiScreen createConfigGui(GuiScreen parentScreen){
-		return new ConfigGui(parentScreen);
+	public RuntimeOptionGuiHandler getHandlerFor(RuntimeOptionCategoryElement element){
+
 	}
+
+	//@Override
+	//public GuiScreen createConfigGui(GuiScreen parentScreen){return new ConfigGui(parentScreen);}
 	
 }

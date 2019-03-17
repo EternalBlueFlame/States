@@ -5,10 +5,10 @@ import java.util.UUID;
 
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import net.fexcraft.lib.common.math.Time;
-import net.fexcraft.lib.mc.utils.Static;
 import net.fexcraft.mod.lib.fcl.JsonUtil;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.MunicipalityType;
+import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.common.config.ConfigElement;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.client.config.IConfigElement;
@@ -90,7 +90,7 @@ public class Config {
 		if(MessageSender.RECEIVER != null){
 			MessageSender.RECEIVER.halt();
 		}
-		if(WEBHOOK != null && BOT_PORT != -1 && Static.getServer() != null){
+		if(WEBHOOK != null && BOT_PORT != -1 && MinecraftServer.getServer() != null){
 			MessageSender.RECEIVER = new MessageSender.Receiver();
 			MessageSender.RECEIVER.start();
 		}

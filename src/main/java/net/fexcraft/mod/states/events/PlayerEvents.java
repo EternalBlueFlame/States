@@ -8,6 +8,7 @@ import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import net.fexcraft.lib.common.math.Time;
+import net.fexcraft.lib.mc.network.packet.PacketNBTTagCompound;
 import net.fexcraft.mod.fsmm.util.Print;
 import net.fexcraft.mod.lib.fcl.Formatter;
 import net.fexcraft.mod.lib.fcl.PacketHandler;
@@ -21,25 +22,13 @@ import net.fexcraft.mod.states.util.MessageSender;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.fexcraft.mod.states.util.TaxSystem;
 import net.fexcraft.mod.states.util.UpdateHandler;
-import net.minecraft.block.BlockButton;
-import net.minecraft.block.BlockChest;
-import net.minecraft.block.BlockDispenser;
-import net.minecraft.block.BlockDropper;
-import net.minecraft.block.BlockFurnace;
-import net.minecraft.block.BlockHopper;
-import net.minecraft.block.BlockLever;
-import net.minecraft.block.BlockPressurePlate;
-import net.minecraft.block.BlockRedstoneComparator;
-import net.minecraft.block.BlockRedstoneRepeater;
-import net.minecraft.block.BlockSign;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.*;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntitySign;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.IChatComponent;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraftforge.event.ServerChatEvent;
@@ -97,20 +86,20 @@ public class PlayerEvents {
 	}
 	
 	@SubscribeEvent
-	public static void onRickClickBlock(PlayerInteractEvent.RightClickBlock event){
-		if(event.world.isRemote || event.entityPlayer.dimension != 0){
+	public static void onRickClickBlock(PlayerInteractEvent event){
+		if(event.world.isRemote || event.entityPlayer.dimension != 0 || event.action != PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK){
 			return;
 		}
-		IBlockState state = event.world.getBlockState(event.getPos());
-		if(state.getBlock() instanceof BlockSign){
+		Block state = event.world.getBlock(event.x,event.y,event.z);
+		if(state instanceof BlockSign){
 			//IBlockState state = event.world.getBlockState(event.getPos());
-			TileEntitySign te_sign = (TileEntitySign)event.world.getTileEntity(event.getPos());
+			TileEntitySign te_sign = (TileEntitySign)event.world.getTileEntity(event.x,event.y,event.z);
 			if(te_sign == null || te_sign.signText == null || te_sign.signText[0] == null){
 				return;
 			}
-			Chunk chunk = StateUtil.getChunk(event.getPos());
+			Chunk chunk = StateUtil.getChunk(event.x,event.z);
 			SignTileEntityCapability cap = te_sign.getCapability(StatesCapabilities.SIGN_TE, null);
-			if(te_sign.signText[0].getUnformattedText().equalsIgnoreCase("[States]")){
+			if(te_sign.signText[0].equalsIgnoreCase("[States]")){
 				if(cap != null){ cap.setup(chunk); }
 			}
 			else if(cap != null && cap.isStatesSign()){
@@ -118,12 +107,12 @@ public class PlayerEvents {
 			}
 			else return;
 		}
-		else if(state.getBlock() instanceof BlockChest || state.getBlock() instanceof BlockFurnace
-				|| state.getBlock() instanceof BlockHopper || state.getBlock() instanceof BlockDispenser
-				|| state.getBlock() instanceof BlockDropper || state.getBlock() instanceof BlockLever
-				|| state.getBlock() instanceof BlockButton || state.getBlock() instanceof BlockPressurePlate
-				|| state.getBlock() instanceof BlockRedstoneRepeater || state.getBlock() instanceof BlockRedstoneComparator){
-			if(!checkAccess(event.world, event.getPos(), state, event.entityPlayer)){
+		else if(state instanceof BlockChest || state instanceof BlockFurnace
+				|| state instanceof BlockHopper || state instanceof BlockDispenser
+				|| state instanceof BlockDropper || state instanceof BlockLever
+				|| state instanceof BlockButton || state instanceof BlockPressurePlate
+				|| state instanceof BlockRedstoneRepeater || state instanceof BlockRedstoneComparator){
+			if(!checkAccess(event.world, event.x,event.y,event.z, event.entityPlayer)){
 				Print.chat(event.entityPlayer, "No permission to interact with these blocks here.");
 				event.setCanceled(true);
 				return;
@@ -136,7 +125,7 @@ public class PlayerEvents {
 	public static void onBlockBreak(BlockEvent.BreakEvent event){
 		if(event.getPlayer().dimension != 0){ return; }
 		if(!checkAccess(event.world, event.x,event.y,event.z, event.getPlayer())){
-			Print.bar(event.getPlayer(), "No permission to break blocks here.");
+			event.getPlayer().addChatComponentMessage(new ChatComponentText(Formatter.format( "No permission to break blocks here.")));
 			event.setCanceled(true);
 		}
 		return;
@@ -146,7 +135,7 @@ public class PlayerEvents {
 	public static void onBlockPlace(BlockEvent.PlaceEvent event){
 		if(event.player.dimension != 0){ return; }
 		if(!checkAccess(event.world, event.x,event.y,event.z, event.player)){
-			Print.bar(event.player, "No permission to place blocks here.");
+			event.player.addChatComponentMessage(new ChatComponentText(Formatter.format("No permission to place blocks here.")));
 			event.setCanceled(true);
 		}
 		return;

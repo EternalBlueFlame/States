@@ -1,5 +1,6 @@
 package net.fexcraft.mod.states.cmds;
 
+import com.mojang.authlib.GameProfile;
 import org.apache.commons.lang3.StringUtils;
 
 import net.fexcraft.lib.mc.api.registry.fCommand;
@@ -114,7 +115,7 @@ public class NickCmd extends CommandBase {
 					Print.chat(sender, "&eNo Permission.");
 					return;
 				}
-				PlayerCapability ocap = getOtherPlayer(server, cap, args[1]);
+				PlayerCapability ocap = getOtherPlayer(MinecraftServer.getServer(), cap, args[1]);
 				if(ocap != null){
 					String name = args[2];
 					for(int i = 3; i < args.length; i++){
@@ -152,7 +153,7 @@ public class NickCmd extends CommandBase {
 	}
 
 	private PlayerCapability  getOtherPlayer(MinecraftServer server, PlayerCapability cap, String string){
-		EntityPlayer othrplyr = server.getPlayerList().getPlayerByUsername(string);
+		GameProfile othrplyr = MinecraftServer.getServer().func_152358_ax().func_152655_a(string);
 		if(othrplyr == null){
 			Print.chat(cap, "&9Player not found.");
 		}

@@ -2,7 +2,7 @@ package net.fexcraft.mod.states.cmds;
 
 import java.awt.Color;
 
-import org.apache.commons.lang3.math.NumberUtils;
+import net.fexcraft.mod.states.util.NumberUtil;
 
 import com.mojang.authlib.GameProfile;
 
@@ -210,7 +210,7 @@ public class DistrictCmd extends CommandBase {
 								Print.chat(sender, "&9Missing Argument!");
 								break;
 							}
-							GameProfile gp = Static.getServer().getPlayerProfileCache().getGameProfileForUsername(args[2]);
+							GameProfile gp = MinecraftServer.getServer().func_152358_ax().func_152655_a(args[2]);
 							if(gp == null || gp.getId() == null){
 								Print.chat(sender, "&cPlayer not found in Cache.");
 								break;
@@ -305,7 +305,7 @@ public class DistrictCmd extends CommandBase {
 								dis.setChunkTax(0); dis.save();
 								Print.chat(sender, "&9District's Chunk Tax was reset!");
 							}
-							else if(NumberUtils.isCreatable(args[2])){
+							else if(NumberUtil.isCreatable(args[2])){
 								dis.setChunkTax(Long.parseLong(args[2])); dis.save();
 								Print.chat(sender, "&9District's Chunk Tax was set! (" + ggas(dis.getChunkTax()) + ")");
 							}

@@ -29,6 +29,7 @@ import net.fexcraft.mod.states.api.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.api.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.impl.GenericPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.server.MinecraftServer;
 
 public class TaxSystem extends TimerTask {
 	
@@ -97,7 +98,7 @@ public class TaxSystem extends TimerTask {
 					ForcedChunksManager.requestUnload(pos);
 				}
 				else{
-					mun.getBank().processAction(Bank.Action.TRANSFER, Static.getServer(), mun.getAccount(), conf, States.SERVERACCOUNT);
+					mun.getBank().processAction(Bank.Action.TRANSFER, MinecraftServer.getServer(), mun.getAccount(), conf, States.SERVERACCOUNT);
 				}
 			}
 		}
@@ -148,14 +149,14 @@ public class TaxSystem extends TimerTask {
 					return;
 				}
 				else if(account.getBalance() > 0 && bank != null && cap.getMunicipality().kickIfBankrupt()){
-					bank.processAction(Bank.Action.TRANSFER, Static.getServer(), account, account.getBalance(), cap.getMunicipality().getAccount());
+					bank.processAction(Bank.Action.TRANSFER, MinecraftServer.getServer(), account, account.getBalance(), cap.getMunicipality().getAccount());
 					MailUtil.send(null, RecipientType.PLAYER, cap.getUUIDAsString(), COLLECTOR, "WARNING! You didn't have enough money to pay your tax, next tax collection cycle you may get kicked!", SYSTEMMAIL);
 					MailUtil.send(null, RecipientType.MUNICIPALITY, cap.getMunicipality().getId(), COLLECTOR, StateLogger.player(cap) + " did not have enough money to pay the full tax.", SYSTEMMAIL);
 					cap.onTaxCollected(date);
 					return;
 				}
 				else if(account.getBalance() > 0 && bank != null && !cap.getMunicipality().kickIfBankrupt()){
-					bank.processAction(Bank.Action.TRANSFER, Static.getServer(), account, account.getBalance(), cap.getMunicipality().getAccount());
+					bank.processAction(Bank.Action.TRANSFER, MinecraftServer.getServer(), account, account.getBalance(), cap.getMunicipality().getAccount());
 					MailUtil.send(null, RecipientType.PLAYER, cap.getUUIDAsString(), COLLECTOR, StateLogger.player(cap) + " did not have enough money to pay the full tax.", SYSTEMMAIL);
 					MailUtil.send(null, RecipientType.MUNICIPALITY, cap.getMunicipality().getId(), COLLECTOR, StateLogger.player(cap) + " did not have enough money to pay the full tax.", SYSTEMMAIL);
 					cap.onTaxCollected(date);
@@ -169,9 +170,9 @@ public class TaxSystem extends TimerTask {
 			}
 			long statetax = tax > 1000 ? getPercentage(tax, cap.getState().getCitizenTaxPercentage()) : 0;
 			long muntax = tax > 1000 ? tax - statetax : tax;
-			bank.processAction(Bank.Action.TRANSFER, Static.getServer(), account, muntax, receiver);
+			bank.processAction(Bank.Action.TRANSFER, MinecraftServer.getServer(), account, muntax, receiver);
 			if(state != null && statetax > 0){
-				bank.processAction(Bank.Action.TRANSFER, Static.getServer(), account, statetax, state);
+				bank.processAction(Bank.Action.TRANSFER, MinecraftServer.getServer(), account, statetax, state);
 			}
 		}
 		cap.onTaxCollected(date);
@@ -226,7 +227,7 @@ public class TaxSystem extends TimerTask {
 					return;
 				}
 				else if(account.getBalance() > 0 && bank != null && value.getDistrict().unclaimIfBankrupt()){
-					bank.processAction(Bank.Action.TRANSFER, Static.getServer(), account, account.getBalance(), value.getMunicipality().getAccount());
+					bank.processAction(Bank.Action.TRANSFER, MinecraftServer.getServer(), account, account.getBalance(), value.getMunicipality().getAccount());
 					MailUtil.send(null, RecipientType.PLAYER, value.getOwner(), COLLECTOR, "WARNING! You didn't have enough money to pay for your Property at " + StateLogger.chunk(value) + ", next tax collection cycle it will be unclaimed!", SYSTEMMAIL);
 					MailUtil.send(null, RecipientType.MUNICIPALITY, value.getMunicipality().getId(), COLLECTOR, "Owner of the Property at " + StateLogger.chunk(value) + " did not have enough money to pay the full tax.", SYSTEMMAIL);
 					//value.getDistrict().getManager() == null ? getMayor(value.getMunicipality()) : value.getDistrict().getManager().toString()
@@ -234,7 +235,7 @@ public class TaxSystem extends TimerTask {
 					return;
 				}
 				else if(account.getBalance() > 0 && bank != null && !value.getDistrict().unclaimIfBankrupt()){
-					bank.processAction(Bank.Action.TRANSFER, Static.getServer(), account, account.getBalance(), value.getMunicipality().getAccount());
+					bank.processAction(Bank.Action.TRANSFER, MinecraftServer.getServer(), account, account.getBalance(), value.getMunicipality().getAccount());
 					MailUtil.send(null, RecipientType.PLAYER, value.getOwner(), COLLECTOR, "WARNING! You didn't have enough money to pay for your Property at " + StateLogger.chunk(value) + "!", SYSTEMMAIL);
 					MailUtil.send(null, RecipientType.MUNICIPALITY, value.getMunicipality().getId(), COLLECTOR, "Owner of the Property at " + StateLogger.chunk(value) + " did not have enough money to pay the full tax.", SYSTEMMAIL);
 					//value.getDistrict().getManager() == null ? getMayor(value.getMunicipality()) : value.getDistrict().getManager().toString()
@@ -251,9 +252,9 @@ public class TaxSystem extends TimerTask {
 			}
 			long statetax = tax > 1000 ? getPercentage(tax, value.getState().getChunkTaxPercentage()) : 0;
 			long muntax = tax > 1000 ? tax - statetax : tax;
-			bank.processAction(Bank.Action.TRANSFER, Static.getServer(), account, muntax, receiver);
+			bank.processAction(Bank.Action.TRANSFER, MinecraftServer.getServer(), account, muntax, receiver);
 			if(state != null && statetax > 0){
-				bank.processAction(Bank.Action.TRANSFER, Static.getServer(), account, statetax, state);
+				bank.processAction(Bank.Action.TRANSFER, MinecraftServer.getServer(), account, statetax, state);
 			}
 		}
 		value.onTaxCollected(date);

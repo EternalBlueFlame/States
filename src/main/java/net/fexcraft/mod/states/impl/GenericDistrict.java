@@ -8,7 +8,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import net.fexcraft.lib.common.math.Time;
-import net.fexcraft.lib.mc.utils.Static;
 import net.fexcraft.mod.lib.fcl.ArrayList;
 import net.fexcraft.mod.lib.fcl.JsonUtil;
 import net.fexcraft.mod.states.States;
@@ -17,6 +16,8 @@ import net.fexcraft.mod.states.api.DistrictType;
 import net.fexcraft.mod.states.api.Municipality;
 import net.fexcraft.mod.states.impl.capabilities.SignTileEntityCapabilityUtil;
 import net.fexcraft.mod.states.util.StateUtil;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 
 public class GenericDistrict implements District {
@@ -130,7 +131,7 @@ public class GenericDistrict implements District {
 	@Override
 	public void setChanged(long new_change){
             changed = new_change;
-            Static.getServer().worlds[0].getChunkProvider().getLoadedChunks().forEach(chunk -> {
+            MinecraftServer.getServer().worldServers[0].getChunkProvider().getLoadedChunks().forEach(chunk -> {
                 SignTileEntityCapabilityUtil.processChunkChange(chunk, "district");
             });
 	}
@@ -250,6 +251,11 @@ public class GenericDistrict implements District {
 	@Override
 	public void setMailbox(BlockPos pos){
 		this.mailbox = pos;
+	}
+
+	@Override
+	public void setMailbox(TileEntity pos){
+		this.mailbox = new BlockPos(pos);
 	}
 
 }

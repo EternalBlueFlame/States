@@ -17,6 +17,7 @@ import net.fexcraft.mod.states.impl.SignMailbox;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntitySign;
 import net.minecraft.util.math.BlockPos;
@@ -38,7 +39,7 @@ public class MailUtil {
 
 	public static boolean send(ICommandSender ics, RecipientType rectype, Object receiver, String sender, String message, MailType type, long expiry, NBTTagCompound compound){
 		try{//This was initially intended to run on a separate thread.
-			World world = Static.getServer().getWorld(0);
+			World world = MinecraftServer.getServer().worldServers[0];
 			if(world == null){
 				printFailure(ics, 0, rectype, receiver, sender, message, type, expiry, compound, null, null); return false;
 			}
@@ -95,9 +96,9 @@ public class MailUtil {
 			Ticket ticket = null;
 			if(!world.isBlockLoaded(mailbox)){
 				ticket = ForcedChunksManager.getFreeTicket();
-				ForgeChunkManager.forceChunk(ticket, pos);
+				ForgeChunkManager.forceChunk(ticket, pos.getChunkCoords());
 			}
-			TileEntity tile = Static.getServer().getWorld(0).getTileEntity(mailbox);
+			TileEntity tile = MinecraftServer.getServer().worldServers[0].getTileEntity(mailbox.getX(),mailbox.getY(),mailbox.getZ());
 			if(tile == null){
 				printFailure(ics, 3, rectype, receiver, sender, message, type, expiry, compound, null, null); return false;
 			}
@@ -109,7 +110,7 @@ public class MailUtil {
 				e.printStackTrace();
 			}
 			if(ticket != null){
-				ForgeChunkManager.unforceChunk(ticket, pos);
+				ForgeChunkManager.unforceChunk(ticket, pos.getChunkCoords());
 			}
 			if(rectype == RecipientType.PLAYER){
 				EntityPlayer player = Static.getServer().getPlayerList().getPlayerByUUID(UUID.fromString(receiver.toString()));
@@ -126,16 +127,16 @@ public class MailUtil {
 		ChunkPos pos = new ChunkPos(mailbox); Ticket ticket = null;
 		if(!world.isBlockLoaded(mailbox)){
 			ticket = ForcedChunksManager.getFreeTicket();
-			ForgeChunkManager.forceChunk(ticket, pos);
+			ForgeChunkManager.forceChunk(ticket, pos.getChunkCoords());
 		}
-		TileEntity entity = world.getTileEntity(mailbox);
+		TileEntity entity = world.getTileEntity(mailbox.getX(),mailbox.getY(),mailbox.getZ());
 		if(entity == null || !entity.hasCapability(FCLCapabilities.SIGN_CAPABILITY, null)){
-			ForgeChunkManager.unforceChunk(ticket, pos);return null;
+			ForgeChunkManager.unforceChunk(ticket, pos.getChunkCoords());return null;
 		}
 		if(entity.getCapability(FCLCapabilities.SIGN_CAPABILITY, null).getListener(SignMailbox.class, SignMailbox.RESLOC).accepts(mailbox, type, receiver)){
-			ForgeChunkManager.unforceChunk(ticket, pos); return mailbox;
+			ForgeChunkManager.unforceChunk(ticket, pos.getChunkCoords()); return mailbox;
 		}
-		else{ ForgeChunkManager.unforceChunk(ticket, pos); return null; }
+		else{ ForgeChunkManager.unforceChunk(ticket, pos.getChunkCoords()); return null; }
 	}
 
 	private static void printFailure(ICommandSender ics, int i, RecipientType rectype, Object receiver, String sender, String message, MailType type, long expiry, NBTTagCompound compound, RecipientType rety, Object rec){

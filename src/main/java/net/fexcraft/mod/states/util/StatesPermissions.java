@@ -3,7 +3,6 @@ package net.fexcraft.mod.states.util;
 import java.util.TreeMap;
 
 import net.fexcraft.mod.fsmm.util.Print;
-import net.fexcraft.lib.mc.utils.Static;
 import net.fexcraft.mod.states.api.Chunk;
 import net.fexcraft.mod.states.api.District;
 import net.fexcraft.mod.states.api.Municipality;
@@ -36,7 +35,7 @@ public class StatesPermissions {
 			}
 		}
 		Print.debug("Perm Check Start;");
-		Print.debug(entity.getName() + " | " + permission + " | GR: " + group);
+		Print.debug(entity.getCommandSenderName() + " | " + permission + " | GR: " + group);
 		Print.debug(perm.toString());
 		if(!group){
 			boolean exit = false;
@@ -60,7 +59,7 @@ public class StatesPermissions {
 			}
 			group = exit;
 		}
-		Print.debug(entity.getName() + " | " + permission + " | PS: " + group);
+		Print.debug(entity.getCommandSenderName() + " | " + permission + " | PS: " + group);
 		Print.debug("Perm Check End;");
 		if(admin){ Print.chat(entity, "&7&oAdmin mode."); }
 		return group;

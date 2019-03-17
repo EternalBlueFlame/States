@@ -4,13 +4,12 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 
 import net.fexcraft.lib.common.math.Time;
-import net.fexcraft.lib.mc.api.packet.IPacketListener;
 import net.fexcraft.lib.mc.network.packet.PacketNBTTagCompound;
 import net.fexcraft.mod.fsmm.util.Print;
-import net.fexcraft.lib.mc.utils.Static;
 import net.fexcraft.mod.fsmm.api.Account;
 import net.fexcraft.mod.fsmm.api.Bank;
 import net.fexcraft.mod.fsmm.util.Config;
+import net.fexcraft.mod.lib.fcl.IPacketListener;
 import net.fexcraft.mod.lib.fcl.PacketHandler;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.Chunk;
@@ -25,6 +24,7 @@ import net.fexcraft.mod.states.util.StatesPermissions;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -40,10 +40,10 @@ public class Listener implements IPacketListener<PacketNBTTagCompound> {
 
 	@Override
 	public void process(PacketNBTTagCompound packet, Object[] objs){
-		Print.debug(packet.nbt.toString(), objs);
+		Print.debug(packet.nbt.toString());
 		EntityPlayerMP player = (EntityPlayerMP)objs[0];
 		World world = player.worldObj;
-		BlockPos pos = player.getPosition();
+		BlockPos pos = new BlockPos(player);
 		switch(packet.nbt.getInteger("from")){
 			case 0:{
 				player.openGui(States.INSTANCE, packet.nbt.getInteger("button") + 1, world, pos.getX(), pos.getY(), pos.getZ());
@@ -55,7 +55,7 @@ public class Listener implements IPacketListener<PacketNBTTagCompound> {
 					PacketHandler.getInstance().sendTo(new ImagePacket("area_view", image), player);
 				}
 				if(packet.nbt.hasKey("cmd")){
-					Static.getServer().commandManager.executeCommand(player, "/ck info " + packet.nbt.getInteger("x") + " " + packet.nbt.getInteger("z"));
+					MinecraftServer.getServer().getCommandManager().executeCommand(player, "/ck info " + packet.nbt.getInteger("x") + " " + packet.nbt.getInteger("z"));
 					return;
 				}
 				NBTTagList list = new NBTTagList();
@@ -108,7 +108,7 @@ public class Listener implements IPacketListener<PacketNBTTagCompound> {
 								compound.setInteger("z", chunk.zCoord());
 								compound.setBoolean("linked", chunk.getLink() != null);
 								if(compound.getBoolean("linked")){
-									compound.setIntArray("link", new int[]{ chunk.getLink().x, chunk.getLink().z });
+									compound.setIntArray("link", new int[]{ chunk.getLink().posX, chunk.getLink().posZ });
 								}
 								compound.setBoolean("owned", chunk.getOwner() != null && !chunk.getOwner().equals("null"));
 								if(compound.getBoolean("owned")){
@@ -134,14 +134,14 @@ public class Listener implements IPacketListener<PacketNBTTagCompound> {
 			case 10:{
 				switch(packet.nbt.getString("request")){
 					case "get_map":{
-						Chunk chunk = world.getChunkFromBlockCoords(pos).getCapability(StatesCapabilities.CHUNK, null).getStatesChunk();
+						Chunk chunk = world.getChunkFromBlockCoords(pos.getX(),pos.getZ()).getCapability(StatesCapabilities.CHUNK, null).getStatesChunk();
 						if(chunk == null){ return; }
 						NBTTagList list = new NBTTagList();
 						for(int i = -5; i < 6; i++){
 							for(int j = -5; j < 6; j++){
 								net.minecraft.world.chunk.Chunk ch = world.getChunkFromChunkCoords(chunk.xCoord() + i, chunk.zCoord() + j);
 								Chunk ck = ch == null ? null : ch.getCapability(StatesCapabilities.CHUNK, null).getStatesChunk();
-								Print.debug(ch, ck);
+								Print.debug(ch.xPosition+":"+ch.zPosition, ck.xCoord()+":"+ck.zCoord());
 								NBTTagCompound compound = new NBTTagCompound();
 								if(ck == null){
 									compound.setInteger("color", Color.BLACK.getRGB());
@@ -161,7 +161,7 @@ public class Listener implements IPacketListener<PacketNBTTagCompound> {
 									compound.setInteger("z", ck.zCoord());
 									compound.setBoolean("linked", ck.getLink() != null);
 									if(compound.getBoolean("linked")){
-										compound.setIntArray("link", new int[]{ chunk.getLink().x, chunk.getLink().z });
+										compound.setIntArray("link", new int[]{ chunk.getLink().posX, chunk.getLink().posZ });
 									}
 									compound.setBoolean("owned", ck.getOwner() != null && !ck.getOwner().equals("null"));
 									if(compound.getBoolean("owned")){

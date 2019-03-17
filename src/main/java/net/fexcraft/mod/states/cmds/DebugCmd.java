@@ -10,7 +10,6 @@ import javax.annotation.Nullable;
 import net.fexcraft.lib.common.math.Time;
 import net.fexcraft.lib.mc.api.registry.fCommand;
 import net.fexcraft.mod.fsmm.util.Print;
-import net.fexcraft.lib.mc.utils.Static;
 import net.fexcraft.mod.fsmm.util.Config;
 import net.fexcraft.mod.lib.fcl.JsonUtil;
 import net.fexcraft.mod.states.States;
@@ -84,7 +83,7 @@ public class DebugCmd extends CommandBase {
                     });
                     Print.chat(sender, "Chunk JSON's printed into console.");
                 }
-                Print.chat(sender, "&7Chunks (World0) loaded: &a" + MinecraftServer.getServer().worlds[0].getChunkProvider().getLoadedChunkCount());
+                Print.chat(sender, "&7Chunks (World0) loaded: &a" + MinecraftServer.getServer().worldServers[0].getChunkProvider().getLoadedChunkCount());
                 Print.chat(sender, "&7Chunks (States) loaded: &a" + States.CHUNKS.size());
                 return;
             }
@@ -190,7 +189,7 @@ public class DebugCmd extends CommandBase {
                 Print.chat(sender, "&7Chunks (States) force-loaded: &a" + l);
                 Print.chat(sender, "&7Chunks (Forge) per ticket: &a" + ForcedChunksManager.chunksPerTicket());
                 Print.chat(sender, "&7Tickets (Forge) available: &a" + ForcedChunksManager.maxTickets());
-                Print.chat(sender, "&7Tickets in use: &a" + tickets + " &7| &9ratio: &3" + Static.divide(loaded, tickets) + "&7 per ticket");
+                Print.chat(sender, "&7Tickets in use: &a" + tickets + " &7| &9ratio: &3" + divide(loaded, tickets) + "&7 per ticket");
                 if(ForcedChunksManager.getTickets().isEmpty() && l > 0){
                 	Print.chat(sender, "&cThere seems to be an error, chunks are registered as loaded, but there are no (forge-chunk-loader) tickets!");
                 }
@@ -198,6 +197,7 @@ public class DebugCmd extends CommandBase {
             }
         }
     }
+    private static long divide(long a, long b){return (a==0||b==0L?0:a/b);}
     
     private long MB(long byt){
         return (byt / 1024) / 1024;

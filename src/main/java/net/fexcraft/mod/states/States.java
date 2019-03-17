@@ -19,9 +19,9 @@ import net.fexcraft.lib.common.math.Time;
 import net.fexcraft.lib.mc.capabilities.sign.SignCapabilitySerializer;
 import net.fexcraft.lib.mc.network.handlers.NBTTagCompoundPacketHandler;
 import net.fexcraft.lib.mc.registry.FCLRegistry;
-import net.fexcraft.lib.mc.utils.Static;
 import net.fexcraft.mod.fsmm.api.Account;
 import net.fexcraft.mod.fsmm.util.DataManager;
+import net.fexcraft.mod.fsmm.util.Print;
 import net.fexcraft.mod.lib.fcl.PacketHandler;
 import net.fexcraft.mod.states.api.Chunk;
 import net.fexcraft.mod.states.api.ChunkPos;
@@ -144,7 +144,7 @@ public class States {
 			(TAX_TIMER = new Timer()).schedule(new TaxSystem(), new Date(mid), Config.TAX_INTERVAL);
 		}
 		if(DATA_MANAGER == null){
-			(DATA_MANAGER = new Timer()).schedule(new StateUtil(), new Date(mid), Static.dev() ? 60000 : Time.MIN_MS * 15);
+			(DATA_MANAGER = new Timer()).schedule(new StateUtil(), new Date(mid), Print.dev() ? 60000 : Time.MIN_MS * 15);
 		}
 		//
 		if(IMG_TIMER == null){

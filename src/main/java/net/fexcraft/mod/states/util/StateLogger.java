@@ -78,7 +78,7 @@ public class StateLogger {
 	}
 
 	public static String player(PlayerCapability cap){
-		return cap.getUUIDAsString() + "(" + (cap.getEntityPlayer() == null ? "off-line" : cap.getName()) + ")";
+		return cap.getUUIDAsString() + "(" + (cap.getEntityPlayer() == null ? "off-line" : cap.getCommandSenderName()) + ")";
 	}
 
 	public static String chunk(Chunk chunk){
@@ -86,7 +86,7 @@ public class StateLogger {
 	}
 
 	public static String chunk(ChunkPos pos){
-		return "Chunk(" + pos.x + ", " + pos.z + ")";
+		return "Chunk(" + pos.posX + ", " + pos.posZ + ")";
 	}
 
 	public static String district(int i){

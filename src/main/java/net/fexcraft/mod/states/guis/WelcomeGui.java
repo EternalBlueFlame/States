@@ -8,15 +8,14 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
+import org.lwjgl.opengl.GL11;
 
 public class WelcomeGui extends GuiContainer {
 
@@ -48,7 +47,7 @@ public class WelcomeGui extends GuiContainer {
 		this.drawTexturedModalRect((this.width - xSize) / 2, (this.height - ySize) / 2, 0, 0, xSize, ySize);
 		//
 		for(Button button : buttons){
-			button.drawButton(mc, mouseX, mouseY, partialTicks);
+			button.drawButton(mc, mouseX, mouseY);
 		}
 		for(int i = 0; i < 7; i++){
 			for(int j = 0; j < 7; j++){
@@ -99,7 +98,7 @@ public class WelcomeGui extends GuiContainer {
 	
 	@Override
 	public void actionPerformed(GuiButton button){
-		Print.debug(button, button.id);
+		Print.debug(button.displayString, button.id+"");
 		if(button.id >= 9){
 			return;
 		}
@@ -107,7 +106,7 @@ public class WelcomeGui extends GuiContainer {
 		compound.setString("target_listener", "states:gui");
 		compound.setInteger("from", 0);
 		compound.setInteger("button", button.id);
-		Print.debug(compound);
+		Print.debug(compound.toString());
 		PacketHandler.getInstance().sendToServer(new PacketNBTTagCompound(compound));
 	}
 	
@@ -118,16 +117,16 @@ public class WelcomeGui extends GuiContainer {
 		}
 
 		@Override
-		public void drawButton(Minecraft mc, int mouseX, int mouseY, float f){
+		public void drawButton(Minecraft mc, int mouseX, int mouseY){
 			if(!this.visible){ return; }
-			GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-			this.hovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
+			GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+			this.field_146123_n = mouseX >= this.xPosition && mouseY >= this.yPosition && mouseX < this.xPosition + this.width && mouseY < this.yPosition + this.height;
 			if(this.displayString.length() > 0){
 				int j = 14737632;
 				if(packedFGColour != 0){ j = packedFGColour; }
 	            else if(!this.enabled){ j = 10526880; }
-	            else if(this.hovered){ j = 16777120; }
-	            this.drawCenteredString(mc.fontRenderer, this.displayString, this.x + this.width / 2, this.y + (this.height - 6) / 2, j);
+	            else if(this.field_146123_n){ j = 16777120; }
+	            this.drawCenteredString(mc.fontRenderer, this.displayString, this.xPosition + this.width / 2, this.yPosition + (this.height - 6) / 2, j);
 			}
 		}
 		

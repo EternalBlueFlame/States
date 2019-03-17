@@ -4,27 +4,23 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import net.fexcraft.mod.lib.fcl.Formatter;
-import org.apache.commons.lang3.math.NumberUtils;
+import net.fexcraft.mod.states.util.NumberUtil;
+import net.minecraft.server.MinecraftServer;
 
 import net.fexcraft.lib.common.math.Time;
 import net.fexcraft.lib.mc.api.registry.fItem;
 import net.fexcraft.lib.mc.utils.Static;
 import net.fexcraft.mod.states.States;
-import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 @fItem(modid = States.MODID, name = "mail", variants = 5, custom_variants = { "empty", "expired", "private", "invite", "system" })
 public class MailItem extends Item {
@@ -38,7 +34,7 @@ public class MailItem extends Item {
 	}
 	
     @SideOnly(Side.CLIENT)
-    public void addInformation(ItemStack stack, @Nullable World world, List<String> tooltip, ITooltipFlag flag){
+    public void addInformation(ItemStack stack, @Nullable World world, List<String> tooltip){
     	//if(stack.getTagCompound() == null && this.getDamage(stack) > 1){this.setDamage(stack, 1); return; }
     	if(stack.getItemDamage() == 0){
         	tooltip.add(Formatter.format("&7Empty Mail."));
@@ -51,7 +47,7 @@ public class MailItem extends Item {
         	NBTTagCompound compound = stack.getTagCompound();
         	tooltip.add(Formatter.format("&9Type: &7" + compound.getString("Type")));
         	tooltip.add(Formatter.format("&9Sender: &7" + Static.getPlayerNameByUUID(compound.getString("Sender"))));
-        	tooltip.add(Formatter.format("&9Receiver: &7" + (NumberUtils.isCreatable(compound.getString("Receiver")) ? compound.getString("Receiver") : Static.getPlayerNameByUUID(compound.getString("Receiver").replace("player:", "")))));
+        	tooltip.add(Formatter.format("&9Receiver: &7" + (NumberUtil.isCreatable(compound.getString("Receiver")) ? compound.getString("Receiver") : Static.getPlayerNameByUUID(compound.getString("Receiver").replace("player:", "")))));
         	if(compound.hasKey("Expiry")){
             	tooltip.add(Formatter.format("&9Expires: &7" + Time.getAsString(compound.getLong("Expiry"))));
         	}
@@ -68,16 +64,15 @@ public class MailItem extends Item {
     }
     
     @Override
-    public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ){
+    public boolean onItemUse(ItemStack stack, EntityPlayer player, World world, int xPos, int yPos, int zPos, int facing, float hitX, float hitY, float hitZ){
     	if(world.isRemote) return EnumActionResult.PASS;
-    	ItemStack stack = player.getHeldItem(hand);
-    	if(stack.getItemDamage() > 1){ Static.getServer().commandManager.executeCommand(player, "/mail read"); }
+    	if(stack.getItemDamage() > 1){ MinecraftServer.getServer().getCommandManager().executeCommand(player, "/mail read"); }
         return EnumActionResult.PASS;
     }
     
     @Override
-    public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> items){
-        if(!this.isInCreativeTab(tab)) return;
+    public void getSubItems(Item item, CreativeTabs tab, List items){
+        if(this.getCreativeTab()!=tab){return;}
         for(int i = 0; i < this.getClass().getAnnotation(fItem.class).variants(); i++){
             items.add(new ItemStack(this, 1, i));
         }

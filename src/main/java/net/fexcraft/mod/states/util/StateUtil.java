@@ -18,7 +18,6 @@ import com.mojang.authlib.GameProfile;
 import com.sun.javafx.geom.Vec3d;
 import cpw.mods.fml.common.FMLCommonHandler;
 import net.fexcraft.mod.fsmm.util.Print;
-import net.fexcraft.lib.mc.utils.Static;
 import net.fexcraft.mod.lib.fcl.Formatter;
 import net.fexcraft.mod.lib.fcl.JsonUtil;
 import net.fexcraft.mod.states.States;
@@ -166,7 +165,7 @@ public class StateUtil extends TimerTask {
 			return getPlayer(uuid, loadtemp);
 		}
 		catch(Exception e){
-			GameProfile gp = MinecraftServer.getServer().getPlayerProfileCache().getGameProfileForUsername(receiver);
+			GameProfile gp = MinecraftServer.getServer().func_152358_ax().func_152655_a(receiver);
 			return gp == null ? null : getPlayer(gp.getId(), loadtemp);
 		}
 	}
