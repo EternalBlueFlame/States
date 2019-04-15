@@ -6,7 +6,6 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.fexcraft.mod.fsmm.util.Config;
 import net.fexcraft.mod.states.States;
 
-@Mod.EventBusSubscriber
 public class ConfigEvents {
 	
 	@SubscribeEvent

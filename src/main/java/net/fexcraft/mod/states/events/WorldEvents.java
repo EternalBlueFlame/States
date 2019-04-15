@@ -2,16 +2,21 @@ package net.fexcraft.mod.states.events;
 
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import net.fexcraft.mod.states.impl.capabilities.ChunkCapabilityUtil;
+import net.fexcraft.mod.states.impl.capabilities.PlayerCapabilityUtil;
+import net.fexcraft.mod.states.impl.capabilities.SignTileEntityCapabilityUtil;
+import net.fexcraft.mod.states.impl.capabilities.WorldCapabilityUtil;
 import net.fexcraft.mod.states.util.ForcedChunksManager;
 import net.fexcraft.mod.states.util.ImageCache;
 import net.fexcraft.mod.states.util.StateLogger;
 import net.fexcraft.mod.states.util.StateUtil;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.tileentity.TileEntitySign;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.world.ExplosionEvent;
 import net.minecraftforge.event.world.WorldEvent;
 
 
-
-@Mod.EventBusSubscriber
 public class WorldEvents {
 	
 
@@ -45,7 +50,6 @@ public class WorldEvents {
 	}
 	
 	//
-	/*
 	@SubscribeEvent
 	public static void onAttachEventTileEntity(AttachCapabilitiesEvent<net.minecraft.tileentity.TileEntity> event){
 		if(event.getObject() instanceof TileEntitySign){
@@ -69,6 +73,6 @@ public class WorldEvents {
 	public static void onAttachEventChunk(AttachCapabilitiesEvent<net.minecraft.world.chunk.Chunk> event){
             if(event.getObject().getWorld().provider.getDimension() != 0){ return; }
             event.addCapability(ChunkCapabilityUtil.REGISTRY_NAME, new ChunkCapabilityUtil(event.getObject()));
-	}*/
+	}
 	
 }

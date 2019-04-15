@@ -20,7 +20,6 @@ import net.fexcraft.mod.states.util.StateLogger;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraftforge.event.world.ChunkEvent;
 
-@Mod.EventBusSubscriber
 public class ChunkEvents {
 	
 	private static int[] def_st = new int[]{ -1, 0 };

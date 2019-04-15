@@ -11,6 +11,7 @@ import java.util.Timer;
 import java.util.TreeMap;
 import java.util.UUID;
 
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.event.*;
 import cpw.mods.fml.common.network.NetworkRegistry;
@@ -32,6 +33,11 @@ import net.fexcraft.mod.states.api.capabilities.ChunkCapability;
 import net.fexcraft.mod.states.api.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.api.capabilities.SignTileEntityCapability;
 import net.fexcraft.mod.states.api.capabilities.WorldCapability;
+import net.fexcraft.mod.states.cmds.*;
+import net.fexcraft.mod.states.events.ChunkEvents;
+import net.fexcraft.mod.states.events.ConfigEvents;
+import net.fexcraft.mod.states.events.PlayerEvents;
+import net.fexcraft.mod.states.events.WorldEvents;
 import net.fexcraft.mod.states.guis.GuiHandler;
 import net.fexcraft.mod.states.guis.Listener;
 import net.fexcraft.mod.states.guis.Receiver;
@@ -52,12 +58,15 @@ import net.fexcraft.mod.states.util.StateUtil;
 import net.fexcraft.mod.states.util.StatesPermissions;
 import net.fexcraft.mod.states.util.TaxSystem;
 import net.fexcraft.mod.states.util.UpdateHandler;
+import net.minecraft.command.CommandHandler;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeChunkManager;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.server.permission.DefaultPermissionLevel;
 import net.minecraftforge.server.permission.PermissionAPI;
+
+import static net.minecraft.server.MinecraftServer.getServer;
 
 @Mod(modid = States.MODID, name = "States", version = States.VERSION, dependencies = "required-after:fcl", /*serverSideOnly = true,*/ guiFactory = "net.fexcraft.mod.states.util.GuiFactory", acceptedMinecraftVersions = "*", acceptableRemoteVersions = "*")
 public class States {
@@ -96,9 +105,37 @@ public class States {
 		ForgeChunkManager.setForcedChunkLoadingCallback(this, new ForcedChunksManager());
 		FCLRegistry.newAutoRegistry(MODID);
 	}
-	
+
+	private ChunkEvents chunkEvents = new ChunkEvents();
+	private ConfigEvents configEvents = new ConfigEvents();
+	private PlayerEvents playerEvents = new PlayerEvents();
+	private WorldEvents worldEvents = new WorldEvents();
+
 	@Mod.EventHandler
 	public void properInit(FMLInitializationEvent event){
+		MinecraftForge.EVENT_BUS.register(chunkEvents);
+
+		if(event.getSide().isServer()) {
+			CommandHandler ch = (CommandHandler) getServer().getCommandManager();
+			ch.registerCommand(new AdminCmd());
+			ch.registerCommand(new ChunkCmd());
+			ch.registerCommand(new DebugCmd());
+			ch.registerCommand(new DistrictCmd());
+			ch.registerCommand(new GuiCmd());
+			ch.registerCommand(new MailCmd());
+			ch.registerCommand(new MunicipalityCmd());
+			ch.registerCommand(new NickCmd());
+			ch.registerCommand(new StateCmd());
+		}
+
+		MinecraftForge.EVENT_BUS.register(configEvents);
+		FMLCommonHandler.instance().bus().register(configEvents);
+
+		MinecraftForge.EVENT_BUS.register(playerEvents);
+		FMLCommonHandler.instance().bus().register(playerEvents);
+
+		MinecraftForge.EVENT_BUS.register(worldEvents);
+		FMLCommonHandler.instance().bus().register(worldEvents);
 		NetworkRegistry.INSTANCE.registerGuiHandler(INSTANCE, new GuiHandler());
 		if(event.getSide().isClient()){
 			MinecraftForge.EVENT_BUS.register(new net.fexcraft.mod.states.guis.LocationUpdate());

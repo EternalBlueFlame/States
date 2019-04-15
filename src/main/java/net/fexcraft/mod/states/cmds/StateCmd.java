@@ -10,7 +10,6 @@ import org.apache.commons.lang3.math.NumberUtils;
 import com.mojang.authlib.GameProfile;
 
 import net.fexcraft.lib.common.math.Time;
-import net.fexcraft.lib.mc.api.registry.fCommand;
 import net.fexcraft.mod.fsmm.util.Print;
 import net.fexcraft.lib.mc.utils.Static;
 import net.fexcraft.mod.fsmm.api.Bank;
@@ -35,7 +34,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
 
-@fCommand
 public class StateCmd extends CommandBase {
 	
 	@Override

@@ -8,7 +8,6 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import net.fexcraft.lib.common.math.Time;
-import net.fexcraft.lib.mc.api.registry.fCommand;
 import net.fexcraft.mod.fsmm.util.Print;
 import net.fexcraft.mod.fsmm.util.Config;
 import net.fexcraft.mod.lib.fcl.JsonUtil;
@@ -27,7 +26,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 
-@fCommand
 public class DebugCmd extends CommandBase {
     
     @Override

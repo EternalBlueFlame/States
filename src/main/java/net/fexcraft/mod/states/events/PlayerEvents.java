@@ -36,7 +36,6 @@ import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.world.BlockEvent;
 
-@Mod.EventBusSubscriber
 public class PlayerEvents {
 	
 	@SubscribeEvent

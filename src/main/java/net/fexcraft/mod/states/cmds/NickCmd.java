@@ -3,7 +3,6 @@ package net.fexcraft.mod.states.cmds;
 import com.mojang.authlib.GameProfile;
 import org.apache.commons.lang3.StringUtils;
 
-import net.fexcraft.lib.mc.api.registry.fCommand;
 import net.fexcraft.mod.fsmm.util.Print;
 import net.fexcraft.mod.states.api.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.api.capabilities.StatesCapabilities;
@@ -14,7 +13,6 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 
-@fCommand
 public class NickCmd extends CommandBase {
 
 	@Override

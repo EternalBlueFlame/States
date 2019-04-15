@@ -7,7 +7,6 @@ import net.fexcraft.mod.states.util.*;
 import com.mojang.authlib.GameProfile;
 
 import net.fexcraft.lib.common.math.Time;
-import net.fexcraft.lib.mc.api.registry.fCommand;
 import net.fexcraft.mod.fsmm.util.Print;
 import net.fexcraft.lib.mc.utils.Static;
 import net.fexcraft.mod.fsmm.api.Account;
@@ -27,7 +26,6 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 
-@fCommand
 public class ChunkCmd extends CommandBase {
 
 	@Override
